@@ -1,0 +1,3 @@
+[run]
+omit =
+    naval/validate_bases.py
