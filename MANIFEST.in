@@ -1,0 +1,5 @@
+include naval/VERSION
+include LICENSE
+include README.md
+include tox.ini
+include requirements.txt
