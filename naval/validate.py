@@ -1,6 +1,7 @@
+import math
 import os
 import sys
-from typing import Dict, List
+from typing import Dict, List, Optional
 import numpy as np
 
 from Bio.PDB import PDBParser
@@ -20,7 +21,7 @@ class NucleotideGeometry:
     """
     Class to keep cache torsion angles for given residue
     """
-    
+
     # pylint: disable=too-many-instance-attributes
     def __init__(self, model, chain, residue) -> None:
         self.model = model
@@ -37,8 +38,14 @@ class NucleotideGeometry:
         self.epsilon = None  # C4'-C3'-O3'-P(i+1)
         self.zeta = None  # C3'-O3'-P(i+1)-O5'(i+1)
         self.chi = None  # O4'-C1'-N1-C2 or O4'-C1'-N9-C4
-        self.tau_max = None  # sugar pucker amplitude
-        self.pseudorotation = None  # the phase angle of pseudorotation
+        self.tau_max: Dict[str, Optional[float]] = {}  # sugar pucker amplitude
+        self.pseudorotation: Dict[str, Optional[float]] = {}  # the phase angle of pseudorotation
+
+        self.theta0 = None  # C4'-O4'-C1'-C2'
+        self.theta1 = None  # O4'-C1'-C2'-C3'
+        self.theta2 = None  # C1'-C2'-C3'-C4'
+        self.theta3 = None  # C2'-C3'-C4'-O4'
+        self.theta4 = None  # C3'-C4'-O4'-C1'
 
     def get_residue_object(self, relative_position: int = 0):
         return self.chain[self.resseq + relative_position]
@@ -55,14 +62,18 @@ class NucleotideGeometry:
 
     def _calculate_disordered_torsions(
         self, atom_names: List[str], atom_relative_positions: List[int]
-    ) -> Dict[str, float]:
+    ) -> Dict[str, Optional[float]]:
         torsions = {}
 
-        atoms1 = self.pick_atoms(atom_names[0], atom_relative_positions[0])
-        atoms2 = self.pick_atoms(atom_names[1], atom_relative_positions[1])
-        atoms3 = self.pick_atoms(atom_names[2], atom_relative_positions[2])
-        atoms4 = self.pick_atoms(atom_names[3], atom_relative_positions[3])
+        try:
+            atoms1 = self.pick_atoms(atom_names[0], atom_relative_positions[0])
+            atoms2 = self.pick_atoms(atom_names[1], atom_relative_positions[1])
+            atoms3 = self.pick_atoms(atom_names[2], atom_relative_positions[2])
+            atoms4 = self.pick_atoms(atom_names[3], atom_relative_positions[3])
+        except KeyError:
+            return {"": None}
 
+        # pylint: disable=too-many-nested-blocks
         for atom1 in atoms1:
             for atom2 in atoms2:
                 for atom3 in atoms3:
@@ -85,15 +96,118 @@ class NucleotideGeometry:
                             torsions[alt_loc] = torsion
         return torsions
 
-    def calculate_torsions(self, atom_names: List[str], atom_relative_positions: List[int]) -> Dict[str, float]:
+    def calculate_torsions(
+        self, atom_names: List[str], atom_relative_positions: List[int]
+    ) -> Dict[str, Optional[float]]:
         if self.residue.is_disordered() == 0:
-            atom1 = self.pick_atoms(atom_names[0], atom_relative_positions[0])[0]
-            atom2 = self.pick_atoms(atom_names[1], atom_relative_positions[1])[0]
-            atom3 = self.pick_atoms(atom_names[2], atom_relative_positions[2])[0]
-            atom4 = self.pick_atoms(atom_names[3], atom_relative_positions[3])[0]
+            try:
+                atom1 = self.pick_atoms(atom_names[0], atom_relative_positions[0])[0]
+                atom2 = self.pick_atoms(atom_names[1], atom_relative_positions[1])[0]
+                atom3 = self.pick_atoms(atom_names[2], atom_relative_positions[2])[0]
+                atom4 = self.pick_atoms(atom_names[3], atom_relative_positions[3])[0]
+            except KeyError:
+                return {"": None}
             return {"": self._round_torsion(atom1, atom2, atom3, atom4)}
 
         return self._calculate_disordered_torsions(atom_names, atom_relative_positions)
+
+    @classmethod
+    def _pseudorotation_with_sd(cls, theta0, theta1, theta2, theta3, theta4):
+        """
+        Calculate pseudorotation angle
+        :param theta: list of theta torsion values, for example theta[0] = torsion(C4', O4' C1', C2')
+        :return: P in deg, standard deviation of P, Tm, standard deviation of Tm
+        """
+        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-locals
+
+        # the initial definition  is Theta(1) = C1-C2-C3-C4, Theta(2) = C2-C3-C4-O4, etc.
+        _theta = [theta2, theta3, theta4, theta0, theta1]
+
+        sum_sin = 0.0
+        sum_cos = 0.0
+
+        for i_t, _t in enumerate(_theta):
+            _x = 0.8 * math.pi * i_t
+            sum_sin += _t * math.sin(_x)
+            sum_cos += _t * math.cos(_x)
+
+        pseudo_deg = math.degrees(math.atan2(-sum_sin, sum_cos))
+
+        if pseudo_deg < 0.0:
+            pseudo_deg += 360.0
+
+        pseudo_rad = math.radians(pseudo_deg)
+        _tm = 0.4 * (math.cos(pseudo_rad) * sum_cos - math.sin(pseudo_rad) * sum_sin)
+
+        _st = 0.0
+        thc = [0.0, 0.0, 0.0, 0.0, 0.0]
+
+        for i_t, _t in enumerate(_theta):
+            thc[i_t] = _tm * math.cos(pseudo_rad + (0.8 * math.pi * i_t))
+            _d = _t - thc[i_t]
+            _st += _d * _d
+
+        sd_tm = math.sqrt(0.4 * _st / 3.0)
+        sd_p = sd_tm / math.radians(_tm)
+        return round(pseudo_deg, 1), sd_p, _tm, sd_tm
+
+    def calculate_alpha(self):
+        self.alpha = self.calculate_torsions(("O3'", "P", "O5'", "C5'"), (-1, 0, 0, 0))
+
+    def calculate_beta(self):
+        self.beta = self.calculate_torsions(("P", "O5'", "C5'", "C4'"), (0, 0, 0, 0))
+
+    def calculate_gamma(self):
+        self.gamma = self.calculate_torsions(("O5'", "C5'", "C4'", "C3'"), (0, 0, 0, 0))
+
+    def calculate_delta(self):
+        self.delta = self.calculate_torsions(("C5'", "C4'", "C3'", "O3'"), (0, 0, 0, 0))
+
+    def calculate_epsilon(self):
+        self.epsilon = self.calculate_torsions(("C4'", "C3'", "O3'", "P"), (0, 0, 0, 1))
+
+    def calculate_zeta(self):
+        self.zeta = self.calculate_torsions(("C3'", "O3'", "P", "O5'"), (0, 0, 1, 1))
+
+    def calculate_theta_and_pseudorotation(self):
+        self.theta0 = self.calculate_torsions(("C4'", "O4'", "C1'", "C2'"), (0, 0, 0, 0))
+        self.theta1 = self.calculate_torsions(("O4'", "C1'", "C2'", "C3'"), (0, 0, 0, 0))
+        self.theta2 = self.calculate_torsions(("C1'", "C2'", "C3'", "C4'"), (0, 0, 0, 0))
+        self.theta3 = self.calculate_torsions(("C2'", "C3'", "C4'", "O4'"), (0, 0, 0, 0))
+        self.theta4 = self.calculate_torsions(("C3'", "C4'", "O4'", "C1'"), (0, 0, 0, 0))
+        print("Theta0", self.theta0)
+        print("Theta1", self.theta1)
+        print("Theta2", self.theta2)
+        print("Theta3", self.theta3)
+        print("Theta4", self.theta4)
+        self.calculate_pseudorotation()
+
+    def calculate_pseudorotation(self):
+        alt_locs = set(self.theta0.keys())
+        alt_locs.update(self.theta1.keys())
+        alt_locs.update(self.theta2.keys())
+        alt_locs.update(self.theta3.keys())
+        alt_locs.update(self.theta4.keys())
+
+        if "" in alt_locs and len(alt_locs) == 1:
+            pseudorotation, _, tau_max, _ = self._pseudorotation_with_sd(
+                self.theta0[""], self.theta1[""], self.theta2[""], self.theta3[""], self.theta4[""]
+            )
+            self.pseudorotation[""] = pseudorotation
+            self.tau_max[""] = tau_max
+
+        alt_locs.discard("")
+        for alt_loc in alt_locs:
+            pseudorotation, _, tau_max, _ = self._pseudorotation_with_sd(
+                self.theta0.get(alt_loc, self.theta0.get("", None)),
+                self.theta1.get(alt_loc, self.theta1.get("", None)),
+                self.theta2.get(alt_loc, self.theta2.get("", None)),
+                self.theta3.get(alt_loc, self.theta3.get("", None)),
+                self.theta4.get(alt_loc, self.theta4.get("", None)),
+            )
+            self.pseudorotation[alt_loc] = pseudorotation
+            self.tau_max[alt_loc] = tau_max
 
     def calculate_chi(self):
         atoms_names = ["O4'", "C1'", "N1", "C2"]
@@ -102,6 +216,13 @@ class NucleotideGeometry:
         self.chi = self.calculate_torsions(atoms_names, (0, 0, 0, 0))
 
     def calculate_conformation(self):
+        self.calculate_alpha()
+        self.calculate_beta()
+        self.calculate_gamma()
+        self.calculate_delta()
+        self.calculate_epsilon()
+        self.calculate_zeta()
+        self.calculate_theta_and_pseudorotation()
         self.calculate_chi()
 
 
@@ -135,7 +256,7 @@ def iterate_struct(structure):
                             inscode,
                         )
                     )
-                    print(line, geometry.chi)
+                    print(line, geometry.alpha, geometry.chi, geometry.pseudorotation)
                     lines.append(line)
     return lines
 
