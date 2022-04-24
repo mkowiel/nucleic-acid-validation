@@ -32,11 +32,14 @@ class NucleotideGeometry:
         self.resseq = self.res_full_id[1]
 
         self.alpha = None  # O3'(i-1)-P-O5'-C5'
+        self.alpha_conformation: Dict[str, Optional[float]] = {}  # ap/sc/-sc
         self.beta = None  # P-O5'-C5'-C4'
         self.gamma = None  # O5'-C5'-C4'-C3'
+        self.gamma_conformation: Dict[str, Optional[float]] = {}  # trans/gauche+/gauche-
         self.delta = None  # C5'-C4'-C3'-O3'
         self.epsilon = None  # C4'-C3'-O3'-P(i+1)
         self.zeta = None  # C3'-O3'-P(i+1)-O5'(i+1)
+        self.zeta_conformation: Dict[str, Optional[float]] = {}  # ap/sc/-sc
         self.chi = None  # O4'-C1'-N1-C2 or O4'-C1'-N9-C4
         self.chi_conformation: Dict[str, Optional[float]] = {}  # syn/anti
 
@@ -158,11 +161,35 @@ class NucleotideGeometry:
     def calculate_alpha(self):
         self.alpha = self.calculate_torsions(("O3'", "P", "O5'", "C5'"), (-1, 0, 0, 0))
 
+    def calculate_alpha_conformation(self):
+        for alt_loc, angle in self.alpha.items():
+            if angle:
+                if 30 <= angle <= 110:
+                    self.alpha_conformation[alt_loc] = "sc+"
+                elif -110 <= angle <= -30:
+                    self.alpha_conformation[alt_loc] = "sc-"
+                elif angle <= -130 or angle > 110:
+                    self.alpha_conformation[alt_loc] = "ap"
+                else:
+                    self.alpha_conformation[alt_loc] = "other"
+
     def calculate_beta(self):
         self.beta = self.calculate_torsions(("P", "O5'", "C5'", "C4'"), (0, 0, 0, 0))
 
     def calculate_gamma(self):
         self.gamma = self.calculate_torsions(("O5'", "C5'", "C4'", "C3'"), (0, 0, 0, 0))
+
+    def calculate_gamma_conformation(self):
+        for alt_loc, angle in self.gamma.items():
+            if angle:
+                if 30 <= angle <= 90:
+                    self.gamma_conformation[alt_loc] = "gauche+"
+                elif -90 <= angle <= -30:
+                    self.gamma_conformation[alt_loc] = "gauche-"
+                elif 150 <= angle or angle <= -150:
+                    self.gamma_conformation[alt_loc] = "trans"
+                else:
+                    self.gamma_conformation[alt_loc] = "other"
 
     def calculate_delta(self):
         self.delta = self.calculate_torsions(("C5'", "C4'", "C3'", "O3'"), (0, 0, 0, 0))
@@ -172,6 +199,18 @@ class NucleotideGeometry:
 
     def calculate_zeta(self):
         self.zeta = self.calculate_torsions(("C3'", "O3'", "P", "O5'"), (0, 0, 1, 1))
+
+    def calculate_zeta_conformation(self):
+        for alt_loc, angle in self.zeta.items():
+            if angle:
+                if 30 <= angle <= 110:
+                    self.zeta_conformation[alt_loc] = "sc+"
+                elif -110 <= angle <= -30:
+                    self.zeta_conformation[alt_loc] = "sc-"
+                elif angle <= -130 or angle > 110:
+                    self.zeta_conformation[alt_loc] = "ap"
+                else:
+                    self.zeta_conformation[alt_loc] = "other"
 
     def calculate_theta_and_pseudorotation(self):
         self.theta0 = self.calculate_torsions(("C4'", "O4'", "C1'", "C2'"), (0, 0, 0, 0))
@@ -209,12 +248,13 @@ class NucleotideGeometry:
 
     def calulate_sugar_conformation(self):
         for alt_loc, angle in self.pseudorotation.items():
-            if 140 <= angle <= 190:
-                self.sugar_conformation[alt_loc] = "C2'-endo"
-            elif 0 <= angle <= 36:
-                self.sugar_conformation[alt_loc] = "C3'-endo"
-            else:
-                self.sugar_conformation[alt_loc] = "Other"
+            if angle:
+                if 140 <= angle <= 190:
+                    self.sugar_conformation[alt_loc] = "C2'-endo"
+                elif 0 <= angle <= 36:
+                    self.sugar_conformation[alt_loc] = "C3'-endo"
+                else:
+                    self.sugar_conformation[alt_loc] = "Other"
 
     def calculate_chi(self):
         atoms_names = ["O4'", "C1'", "N1", "C2"]
@@ -224,52 +264,56 @@ class NucleotideGeometry:
 
     def calculate_chi_conformation(self):
         for alt_loc, angle in self.chi.items():
-            if -90 <= angle <= 90:
-                self.chi_conformation[alt_loc] = "syn"
-            else:
-                self.chi_conformation[alt_loc] = "anti"
+            if angle:
+                if -90 <= angle <= 90:
+                    self.chi_conformation[alt_loc] = "syn"
+                else:
+                    self.chi_conformation[alt_loc] = "anti"
 
     def calculate_conformation(self):
         self.calculate_alpha()
+        self.calculate_alpha_conformation()
         self.calculate_beta()
         self.calculate_gamma()
+        self.calculate_gamma_conformation()
         self.calculate_delta()
         self.calculate_epsilon()
         self.calculate_zeta()
+        self.calculate_zeta_conformation()
         self.calculate_theta_and_pseudorotation()
         self.calulate_sugar_conformation()
         self.calculate_chi()
         self.calculate_chi_conformation()
 
     @staticmethod
-    def _print_torsion(name, torsion):
+    def _print_torsion(name, torsion, conformation=None):
         for alt_loc in sorted(torsion.keys()):
             _alt_loc = alt_loc if alt_loc else " "
-            print(f"\t {name} {_alt_loc} {torsion[alt_loc]}")
+            _conformation = conformation[alt_loc] if conformation else ""
+            print(f"\t {name} {_alt_loc} {torsion[alt_loc]} {_conformation}")
 
     def prepare_report_torsion(self):
         print(f"Chain: {self.chain.get_id()}, Residue id: {self.resseq}, Residue name: {self.res_name}")
-        self._print_torsion("Alpha   (O3'(i-1)-P-O5'-C5'):         ", self.alpha)
+        self._print_torsion("Alpha   (O3'(i-1)-P-O5'-C5'):         ", self.alpha, self.alpha_conformation)
         self._print_torsion("Beta    (P-O5'-C5'-C4'):              ", self.beta)
-        self._print_torsion("Gamma   (O5'-C5'-C4'-C3'):            ", self.gamma)
+        self._print_torsion("Gamma   (O5'-C5'-C4'-C3'):            ", self.gamma, self.gamma_conformation)
         self._print_torsion("Delta   (C5'-C4'-C3'-O3'):            ", self.delta)
         self._print_torsion("Epsilon (C4'-C3'-O3'-P(i+1)):         ", self.epsilon)
-        self._print_torsion("Zeta    (C3'-O3'-P(i+1)-O5'(i+1)):    ", self.zeta)
-        self._print_torsion("Chi     (O4'-C1'-N1-C2/O4'-C1'-N9-C4):", self.chi)
-        self._print_torsion("Chi conformation:                     ", self.chi_conformation)
+        self._print_torsion("Zeta    (C3'-O3'-P(i+1)-O5'(i+1)):    ", self.zeta, self.zeta_conformation)
+        self._print_torsion("Chi     (O4'-C1'-N1-C2/O4'-C1'-N9-C4):", self.chi, self.chi_conformation)
         self._print_torsion("Theta0  (C4'-O4'-C1'-C2'):            ", self.theta0)
         self._print_torsion("Theta1  (O4'-C1'-C2'-C3'):            ", self.theta1)
         self._print_torsion("Theta2  (C1'-C2'-C3'-C4'):            ", self.theta2)
         self._print_torsion("Theta3  (C2'-C3'-C4'-O4'):            ", self.theta3)
         self._print_torsion("Theta4  (C3'-C4'-O4'-C1'):            ", self.theta4)
         self._print_torsion("Tau_max:                              ", self.tau_max)
-        self._print_torsion("Pseudorotation:                       ", self.pseudorotation)
-        self._print_torsion("Sugar conformation:                   ", self.sugar_conformation)
+        self._print_torsion("Pseudorotation:                       ", self.pseudorotation, self.sugar_conformation)
 
 
 def iterate_struct(structure):
     lines = []
     pdbcode = structure.id
+    print(f"PDB id: {pdbcode}")
 
     for model in structure:
         model_id = model.get_id()
