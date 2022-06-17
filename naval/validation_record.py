@@ -18,6 +18,7 @@ class ValidationRecord:
         "atom3",
         "calculated_value",
         "target_value",
+        "target_sigma",
         "csd_left",
         "csd_right",
         "pdb_lv3_left",
@@ -40,8 +41,7 @@ class ValidationRecord:
         atom3: Atom,
         calculated_value: float,
         target_value: float,
-        csd_left: float,
-        csd_right: float,
+        target_sigma: float,
         # percentiles equvalent of 3 sigma 0.9973% of population (1 per 370)
         pdb_lv3_left: float,
         pdb_lv3_right: float,
@@ -58,9 +58,10 @@ class ValidationRecord:
         self.atom3 = atom3
         self.calculated_value = calculated_value
         self.target_value = target_value
+        self.target_sigma = target_sigma
 
-        self.csd_left = csd_left
-        self.csd_right = csd_right
+        self.csd_left = self.target_value - 3 * self.target_sigma
+        self.csd_right = self.target_value + 3 * self.target_sigma
 
         self.pdb_lv3_left = pdb_lv3_left
         self.pdb_lv3_right = pdb_lv3_right
