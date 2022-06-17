@@ -3,6 +3,7 @@ import numpy as np
 from Bio.PDB.vectors import calc_angle
 
 from naval.nucleotide_geometry import NucleotideGeometry
+from naval.validation_record import ValidationRecord
 
 
 class BondDefinition:
@@ -272,37 +273,6 @@ class Validator:
     def validate(self):
         pass
 
-    def _print_line(
-        self, validation_type, atom1, atom2, atom3, calculated_value, csd_target, in_csd, in_3pdb, in_4pdb, is_outlier
-    ):
-        # pylint: disable=too-many-arguments
-        line = ",".join(
-            str(_)
-            for _ in (
-                validation_type,
-                self.geometry.pdbcode,
-                self.geometry.model.get_id(),
-                self.geometry.chain.get_id(),
-                self.geometry.res_name,
-                self.geometry.resseq,
-                self.geometry.inscode,
-                atom1.get_name(),
-                atom1.get_altloc(),
-                atom2.get_name(),
-                atom2.get_altloc(),
-                atom3.get_name() if atom3 else "",
-                atom3.get_altloc() if atom3 else "",
-                calculated_value,
-                csd_target,
-                in_csd,
-                in_3pdb,
-                in_4pdb,
-                is_outlier,
-            )
-        )
-        print(line)
-        return line
-
 
 class BasesValidator(Validator):
     """
@@ -314,13 +284,10 @@ class BasesValidator(Validator):
     def _validate_bonds(self, res_name, resseq, chain):
         # pylint: disable=too-many-locals
 
-        lines = []
+        records = []
         for definition in BASES_BONDS[res_name]:
             atom_group1 = chain[resseq][definition.atom1]
             atom_group2 = chain[resseq][definition.atom2]
-
-            csd_3low = definition.csd_target - self.csd_sig * definition.csd_std
-            csd_3high = definition.csd_target + self.csd_sig * definition.csd_std
 
             atoms1 = atom_group1.disordered_get_list() if atom_group1.is_disordered() else [atom_group1]
             atoms2 = atom_group2.disordered_get_list() if atom_group2.is_disordered() else [atom_group2]
@@ -332,41 +299,34 @@ class BasesValidator(Validator):
                         or atom1.get_altloc() == " "
                         or atom2.get_altloc() == " "
                     ):
-                        dist = round(atom2 - atom1, 3)
 
-                        in_csd = csd_3low <= dist <= csd_3high
-                        in_3pdb = False if in_csd else (definition.pdb_3low <= dist <= definition.pdb_3high)
-                        in_4pdb = (
-                            False if (in_csd or in_3pdb) else (definition.pdb_4low <= dist <= definition.pdb_4high)
-                        )
-                        is_outlier = not (in_4pdb or in_3pdb or in_csd)
-                        lines.append(
-                            self._print_line(
+                        dist = round(atom2 - atom1, 3)
+                        records.append(
+                            ValidationRecord(
                                 "bond",
+                                self.geometry,
                                 atom1,
                                 atom2,
                                 None,
                                 dist,
                                 definition.csd_target,
-                                in_csd,
-                                in_3pdb,
-                                in_4pdb,
-                                is_outlier,
+                                definition.csd_std,
+                                definition.pdb_3low,
+                                definition.pdb_3high,
+                                definition.pdb_4low,
+                                definition.pdb_4high,
                             )
                         )
-        return lines
+        return records
 
     def _validate_angles(self, res_name, resseq, chain):
         # pylint: disable=too-many-locals
 
-        lines = []
+        records = []
         for definition in BASES_ANGLES[res_name]:
             atom_group1 = chain[resseq][definition.atom1]
             atom_group2 = chain[resseq][definition.atom2]
             atom_group3 = chain[resseq][definition.atom3]
-
-            csd_3low = definition.csd_target - self.csd_sig * definition.csd_std
-            csd_3high = definition.csd_target + self.csd_sig * definition.csd_std
 
             atoms1 = atom_group1.disordered_get_list() if atom_group1.is_disordered() else [atom_group1]
             atoms2 = atom_group2.disordered_get_list() if atom_group2.is_disordered() else [atom_group2]
@@ -392,37 +352,31 @@ class BasesValidator(Validator):
                             )
                             angle_value = np.round(np.rad2deg(angle_value), 1)
 
-                            in_csd = csd_3low <= angle_value <= csd_3high
-                            in_3pdb = False if in_csd else (definition.pdb_3low <= angle_value <= definition.pdb_3high)
-                            in_4pdb = (
-                                False
-                                if (in_csd or in_3pdb)
-                                else (definition.pdb_4low <= angle_value <= definition.pdb_4high)
-                            )
-                            is_outlier = not (in_4pdb or in_3pdb or in_csd)
-                            lines.append(
-                                self._print_line(
+                            records.append(
+                                ValidationRecord(
                                     "angle",
+                                    self.geometry,
                                     atom1,
                                     atom2,
                                     atom3,
                                     angle_value,
                                     definition.csd_target,
-                                    in_csd,
-                                    in_3pdb,
-                                    in_4pdb,
-                                    is_outlier,
+                                    definition.csd_std,
+                                    definition.pdb_3low,
+                                    definition.pdb_3high,
+                                    definition.pdb_4low,
+                                    definition.pdb_4high,
                                 )
                             )
 
-        return lines
+        return records
 
     def validate(self):
         res_name = self.geometry.res_name
         resseq = self.geometry.resseq
         chain = self.geometry.chain
 
-        lines = []
-        lines.extend(self._validate_bonds(res_name, resseq, chain))
-        lines.extend(self._validate_angles(res_name, resseq, chain))
-        return lines
+        records = []
+        records.extend(self._validate_bonds(res_name, resseq, chain))
+        records.extend(self._validate_angles(res_name, resseq, chain))
+        return records

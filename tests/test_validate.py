@@ -1,6 +1,7 @@
 import os
 from naval.validate import iterate_struct
 from naval.validate import read_structure
+from naval.printer import CsvPrinter
 
 
 def test_read_structure():
@@ -10,4 +11,6 @@ def test_read_structure():
 
 def test_iterate_struct():
     struct = read_structure(os.path.dirname(__file__) + "/examples/1d8g.pdb")
-    assert len(iterate_struct(struct)) > 0
+    records = iterate_struct(struct)
+    assert len(records) > 0
+    print("\n".join(CsvPrinter().print(records)))

@@ -6,6 +6,7 @@ from Bio.PDB import PDBParser
 from naval.nucleotide_geometry import NUCLEOTIDE_RES_NAMES
 from naval.nucleotide_geometry import NucleotideGeometry
 from naval.bases_validator import BasesValidator
+from naval.printer import CsvPrinter
 
 
 def read_structure(pdb_file_path):
@@ -15,7 +16,7 @@ def read_structure(pdb_file_path):
 
 
 def iterate_struct(structure):
-    lines = []
+    records = []
     pdbcode = structure.id
     print(f"# PDB id: {pdbcode}")
     for model in structure:
@@ -28,13 +29,17 @@ def iterate_struct(structure):
                     geometry.prepare_report_torsion()
 
                     bases = BasesValidator(geometry)
-                    lines.extend(bases.validate())
-    return lines
+                    records.extend(bases.validate())
+    return records
 
 
 def main(filepath):
     sructure = read_structure(filepath)
-    iterate_struct(sructure)
+    records = iterate_struct(sructure)
+    printer = CsvPrinter()
+    lines = printer.print(records)
+    # print or save to file
+    print("\n".join(lines))
     return 0
 
 
