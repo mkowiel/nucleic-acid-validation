@@ -3,6 +3,7 @@ from typing import Dict, List, Optional
 import numpy as np
 
 from Bio.PDB.vectors import calc_dihedral
+from Bio.PDB.Atom import Atom
 
 
 NUCLEOTIDE_RES_NAMES = ("A", "C", "G", "T", "U", "DA", "DC", "DG", "DT", "DU")
@@ -15,7 +16,12 @@ class NucleotideGeometry:
     """
 
     # pylint: disable=too-many-instance-attributes
-    def __init__(self, pdbcode, model, chain, residue) -> None:
+    def __init__(self, pdbcode: str, model, chain, residue) -> None:
+        """Simple container class to keep torsion angles of the residue.
+        Calculates torison anles for all alternative conformations.
+        Maps torsion angles to string classes.
+        """
+
         self.pdbcode = pdbcode
         self.model = model
         self.chain = chain
@@ -25,27 +31,28 @@ class NucleotideGeometry:
         self.resseq = self.res_full_id[1]
         self.inscode = self.res_full_id[2]
 
-        self.alpha = None  # O3'(i-1)-P-O5'-C5'
-        self.alpha_conformation: Dict[str, Optional[float]] = {}  # ap/sc/-sc
-        self.beta = None  # P-O5'-C5'-C4'
-        self.gamma = None  # O5'-C5'-C4'-C3'
-        self.gamma_conformation: Dict[str, Optional[float]] = {}  # trans/gauche+/gauche-
-        self.delta = None  # C5'-C4'-C3'-O3'
-        self.epsilon = None  # C4'-C3'-O3'-P(i+1)
-        self.zeta = None  # C3'-O3'-P(i+1)-O5'(i+1)
-        self.zeta_conformation: Dict[str, Optional[float]] = {}  # ap/sc/-sc
-        self.chi = None  # O4'-C1'-N1-C2 or O4'-C1'-N9-C4
-        self.chi_conformation: Dict[str, Optional[float]] = {}  # syn/anti
+        self.alpha: Dict[str, Optional[float]] = {}  # O3'(i-1)-P-O5'-C5'
+        self.beta: Dict[str, Optional[float]] = {}  # P-O5'-C5'-C4'
+        self.gamma: Dict[str, Optional[float]] = {}  # O5'-C5'-C4'-C3'
+        self.delta: Dict[str, Optional[float]] = {}  # C5'-C4'-C3'-O3'
+        self.epsilon: Dict[str, Optional[float]] = {}  # C4'-C3'-O3'-P(i+1)
+        self.zeta: Dict[str, Optional[float]] = {}  # C3'-O3'-P(i+1)-O5'(i+1)
+        self.chi: Dict[str, Optional[float]] = {}  # O4'-C1'-N1-C2 or O4'-C1'-N9-C4
+
+        self.theta0: Dict[str, Optional[float]] = {}  # C4'-O4'-C1'-C2'
+        self.theta1: Dict[str, Optional[float]] = {}  # O4'-C1'-C2'-C3'
+        self.theta2: Dict[str, Optional[float]] = {}  # C1'-C2'-C3'-C4'
+        self.theta3: Dict[str, Optional[float]] = {}  # C2'-C3'-C4'-O4'
+        self.theta4: Dict[str, Optional[float]] = {}  # C3'-C4'-O4'-C1'
+
+        self.alpha_conformation: Dict[str, Optional[str]] = {}  # ap/sc/-sc
+        self.gamma_conformation: Dict[str, Optional[str]] = {}  # trans/gauche+/gauche-
+        self.zeta_conformation: Dict[str, Optional[str]] = {}  # ap/sc/-sc
+        self.chi_conformation: Dict[str, Optional[str]] = {}  # syn/anti
 
         self.tau_max: Dict[str, Optional[float]] = {}  # sugar pucker amplitude
         self.pseudorotation: Dict[str, Optional[float]] = {}  # the phase angle of pseudorotation
-        self.sugar_conformation: Dict[str, Optional[float]] = {}  # sugar conformation (C2' endo or C3' endo)
-
-        self.theta0 = None  # C4'-O4'-C1'-C2'
-        self.theta1 = None  # O4'-C1'-C2'-C3'
-        self.theta2 = None  # C1'-C2'-C3'-C4'
-        self.theta3 = None  # C2'-C3'-C4'-O4'
-        self.theta4 = None  # C3'-C4'-O4'-C1'
+        self.sugar_conformation: Dict[str, Optional[str]] = {}  # sugar conformation (C2' endo or C3' endo)
 
     def pick_atoms(self, atom_name: str, relative_position: int):
         relative_residue = self.chain[self.resseq + relative_position]
@@ -53,9 +60,19 @@ class NucleotideGeometry:
         return atom_group.disordered_get_list() if atom_group.is_disordered() else [atom_group]
 
     @staticmethod
-    def _round_torsion(atom1, atom2, atom3, atom4):
+    def _round_torsion(atom1: Atom, atom2: Atom, atom3: Atom, atom4: Atom):
         torsion = calc_dihedral(atom1.get_vector(), atom2.get_vector(), atom3.get_vector(), atom4.get_vector())
         return round(np.rad2deg(torsion), 1)
+
+    def _calculate_ordered_torsions(self, atom_names: List[str], atom_relative_positions: List[int]):
+        try:
+            atom1 = self.pick_atoms(atom_names[0], atom_relative_positions[0])[0]
+            atom2 = self.pick_atoms(atom_names[1], atom_relative_positions[1])[0]
+            atom3 = self.pick_atoms(atom_names[2], atom_relative_positions[2])[0]
+            atom4 = self.pick_atoms(atom_names[3], atom_relative_positions[3])[0]
+        except KeyError:
+            return {"": None}
+        return {"": self._round_torsion(atom1, atom2, atom3, atom4)}
 
     def _calculate_disordered_torsions(
         self, atom_names: List[str], atom_relative_positions: List[int]
@@ -97,15 +114,7 @@ class NucleotideGeometry:
         self, atom_names: List[str], atom_relative_positions: List[int]
     ) -> Dict[str, Optional[float]]:
         if self.residue.is_disordered() == 0:
-            try:
-                atom1 = self.pick_atoms(atom_names[0], atom_relative_positions[0])[0]
-                atom2 = self.pick_atoms(atom_names[1], atom_relative_positions[1])[0]
-                atom3 = self.pick_atoms(atom_names[2], atom_relative_positions[2])[0]
-                atom4 = self.pick_atoms(atom_names[3], atom_relative_positions[3])[0]
-            except KeyError:
-                return {"": None}
-            return {"": self._round_torsion(atom1, atom2, atom3, atom4)}
-
+            return self._calculate_ordered_torsions(atom_names, atom_relative_positions)
         return self._calculate_disordered_torsions(atom_names, atom_relative_positions)
 
     @classmethod

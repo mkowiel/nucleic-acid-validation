@@ -17,8 +17,7 @@ def read_structure(pdb_file_path):
 def iterate_struct(structure):
     lines = []
     pdbcode = structure.id
-    print(f"PDB id: {pdbcode}")
-
+    print(f"# PDB id: {pdbcode}")
     for model in structure:
         for chain in model:
             for residue in chain:
