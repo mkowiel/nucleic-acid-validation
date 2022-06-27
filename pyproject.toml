@@ -9,11 +9,10 @@ max-line-length = 120
 [tool.pylint.MASTER]
 init-hook="import os, sys; sys.path.insert(0, os.path.abspath(os.path.dirname('.')))"
 ignore = '''.git,
-        validate_bases.py
 '''
 
 [tool.pylint.tests]
-
-disable = '''missing-module-docstring,
+disable = '''
+        missing-module-docstring,
         missing-function-docstring
 '''

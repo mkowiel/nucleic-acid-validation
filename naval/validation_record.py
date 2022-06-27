@@ -1,3 +1,5 @@
+from typing import Optional
+
 from Bio.PDB.Atom import Atom
 
 from naval.nucleotide_geometry import NucleotideGeometry
@@ -12,6 +14,7 @@ class ValidationRecord:
 
     __slots__ = (
         "validation_type",
+        "name",
         "geometry",
         "atom1",
         "atom2",
@@ -35,6 +38,7 @@ class ValidationRecord:
     def __init__(
         self,
         validation_type: str,
+        name: str,
         geometry: NucleotideGeometry,
         atom1: Atom,
         atom2: Atom,
@@ -43,15 +47,16 @@ class ValidationRecord:
         target_value: float,
         target_sigma: float,
         # percentiles equvalent of 3 sigma 0.9973% of population (1 per 370)
-        pdb_lv3_left: float,
-        pdb_lv3_right: float,
+        pdb_lv3_left: Optional[float],
+        pdb_lv3_right: Optional[float],
         # percentiles equvalent of 4 sigma 0.9999% of population (1 per 15787)
-        pdb_lv4_left: float,
-        pdb_lv4_right: float,
+        pdb_lv4_left: Optional[float],
+        pdb_lv4_right: Optional[float],
     ) -> None:
         if validation_type not in ("angle", "bond"):
             raise ValueError("Validation type nees to one of ['angle', 'bond']")
         self.validation_type = validation_type
+        self.name = name
         self.geometry = geometry
         self.atom1 = atom1
         self.atom2 = atom2
