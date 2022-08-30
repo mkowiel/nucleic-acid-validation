@@ -1,5 +1,7 @@
+from naval.validators.validator import Validator
 from naval.restraint_definition import AngleDefinition
 from naval.restraint_definition import BondDefinition
+from naval.nucleotide_geometry import NucleotideGeometry
 
 
 PO4_BONDS = {
@@ -152,3 +154,16 @@ PO4_ANGLES = {
         AngleDefinition("PO4==AS_3", "P", "O5'", "C5'", 121.6, 2.8, None, None, None, None, None, None, None),
     ],
 }
+
+
+class Po4Validator(Validator):
+    """
+    Validator for nucleotde basees
+    """
+
+    # pylint: disable=too-few-public-methods
+    def __init__(self, geometry: NucleotideGeometry, csd_sig: float = 3) -> None:
+        super().__init__(geometry, csd_sig)
+
+        self.bonds_definition = PO4_BONDS
+        self.angles_definition = PO4_ANGLES

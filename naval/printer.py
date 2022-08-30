@@ -36,7 +36,7 @@ class CsvPrinter(Printer):
     def format_header(cls):
         return (
             "type,pdbcode,modeid,chain,res_name,resseq,inscode,atom1_name,atom1_altloc,"
-            "atom2_name,atom3_altloc,atom1_name,atom3_altloc,calculated,target,in_csd,in_pdb_lv3,in_pdb_lv4,outlier"
+            "atom2_name,atom3_altloc,atom1_name,atom3_altloc,calculated,target,preferred,allowed,suspicious,outlier"
         )
 
     @classmethod
@@ -59,9 +59,9 @@ class CsvPrinter(Printer):
                 record.atom3.get_altloc() if record.atom3 else "",
                 record.calculated_value,
                 record.target_value,
-                record.in_csd,
-                record.in_pdb_lv3,
-                record.in_pdb_lv4,
+                record.preferred,
+                record.allowed,
+                record.suspicious,
                 record.outlier,
             )
         )
