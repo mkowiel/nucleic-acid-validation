@@ -6,6 +6,7 @@ from Bio.PDB import PDBParser
 from naval.nucleotide_geometry import NUCLEOTIDE_RES_NAMES
 from naval.nucleotide_geometry import NucleotideGeometry
 from naval.validators.bases_validator import BasesValidator
+from naval.validators.po4_validator import Po4Validator
 from naval.printer import CsvPrinter
 
 
@@ -30,6 +31,10 @@ def validate_structure(structure):
 
                     bases = BasesValidator(geometry)
                     records.extend(bases.validate())
+
+                    po4 = Po4Validator(geometry)
+                    records.extend(po4.validate())
+
     return records
 
 

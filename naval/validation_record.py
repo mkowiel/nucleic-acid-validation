@@ -79,6 +79,12 @@ class ValidationRecord:
         self.suspicious = self.is_suspicious()
         self.outlier = self.is_outlier()
 
+    def __str__(self):
+        return (
+            f"{self.validation_type} {self.name} {self.atom1} {self.atom2}"
+            f" {self.atom3} {self.calculated_value:.3f} {self.target_value}"
+        )
+
     def is_preferred(self):
         return self.csd_preferred_left <= self.calculated_value <= self.csd_preferred_right
 

@@ -4,6 +4,8 @@ import numpy as np
 
 from Bio.PDB.vectors import calc_dihedral
 from Bio.PDB.Atom import Atom
+from Bio.PDB.Chain import Chain
+from Bio.PDB.Residue import Residue
 
 
 NUCLEOTIDE_RES_NAMES = ("A", "C", "G", "T", "U", "DA", "DC", "DG", "DT", "DU")
@@ -16,7 +18,7 @@ class NucleotideGeometry:
     """
 
     # pylint: disable=too-many-instance-attributes
-    def __init__(self, pdbcode: str, model, chain, residue) -> None:
+    def __init__(self, pdbcode: str, model, chain: Chain, residue: Residue) -> None:
         """Simple container class to keep torsion angles of the residue.
         Calculates torison anles for all alternative conformations.
         Maps torsion angles to string classes.
@@ -55,8 +57,8 @@ class NucleotideGeometry:
         self.sugar_conformation: Dict[str, Optional[str]] = {}  # sugar conformation (C2' endo or C3' endo)
 
     def pick_atoms(self, atom_name: str, relative_position: int):
-        relative_residue = self.chain[self.resseq + relative_position]
-        atom_group = relative_residue[atom_name]
+        relative_residue: Residue = self.chain[self.resseq + relative_position]
+        atom_group: Atom = relative_residue[atom_name]
         return atom_group.disordered_get_list() if atom_group.is_disordered() else [atom_group]
 
     @staticmethod
