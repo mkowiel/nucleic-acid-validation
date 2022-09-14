@@ -71,6 +71,38 @@ PO4_BONDS = {
         BondDefinition("PO4==AS_3", "O3'", "C3'", 1.438, 0.007, 0, 1.5, 0.01, 1, 2, 1, 2),
         BondDefinition("PO4==AS_3", "O5'", "C5'", 1.437, 0.017, 0, 1.5, 0.01, 1, 2, 1, 2),
     ],
+    "other==A_G": [
+        BondDefinition("other==A_G", "OP1", "P", 1.485, 0.017, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==A_G", "OP2", "P", 1.485, 0.017, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==A_G", "O3'", "P", 1.607, 0.012, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==A_G", "O5'", "P", 1.593, 0.010, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==A_G", "O3'", "C3'", 1.420, 0.009, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==A_G", "O5'", "C5'", 1.426, 0.014, 0, 1.5, 0.01, 1, 2, 1, 2),
+    ],
+    "other==DA_DG": [
+        BondDefinition("other==DA_DG", "OP1", "P", 1.485, 0.017, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==DA_DG", "OP2", "P", 1.485, 0.017, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==DA_DG", "O3'", "P", 1.607, 0.012, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==DA_DG", "O5'", "P", 1.593, 0.010, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==DA_DG", "O3'", "C3'", 1.427, 0.011, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==DA_DG", "O5'", "C5'", 1.424, 0.011, 0, 1.5, 0.01, 1, 2, 1, 2),
+    ],
+    "other==U_T_C": [
+        BondDefinition("other==U_T_C", "OP1", "P", 1.485, 0.017, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==U_T_C", "OP2", "P", 1.485, 0.017, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==U_T_C", "O3'", "P", 1.607, 0.012, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==U_T_C", "O5'", "P", 1.593, 0.010, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==U_T_C", "O3'", "C3'", 1.420, 0.011, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==U_T_C", "O5'", "C5'", 1.429, 0.012, 0, 1.5, 0.01, 1, 2, 1, 2),
+    ],
+    "other==DU_DT_DC": [
+        BondDefinition("other==DU_DT_DC", "OP1", "P", 1.485, 0.017, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==DU_DT_DC", "OP2", "P", 1.485, 0.017, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==DU_DT_DC", "O3'", "P", 1.607, 0.012, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==DU_DT_DC", "O5'", "P", 1.593, 0.010, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==DU_DT_DC", "O3'", "C3'", 1.430, 0.015, 0, 1.5, 0.01, 1, 2, 1, 2),
+        BondDefinition("other==DU_DT_DC", "O5'", "C5'", 1.425, 0.014, 0, 1.5, 0.01, 1, 2, 1, 2),
+    ],
 }
 
 
@@ -155,6 +187,16 @@ PO4_ANGLES = {
         AngleDefinition("PO4==AS_3", "P", "O3'", "C3'", 121.5, 3.0, 0, 180, 180, 0, 360, 0, 360),
         AngleDefinition("PO4==AS_3", "P", "O5'", "C5'", 121.6, 2.8, 0, 180, 180, 0, 360, 0, 360),
     ],
+    "other": [
+        AngleDefinition("other", "OP1", "P", "OP2", 119.6, 1.5, 0, 180, 180, 0, 360, 0, 360),
+        AngleDefinition("other", "OP1", "P", "O3'", 107.7, 3.2, 0, 180, 180, 0, 360, 0, 360),
+        AngleDefinition("other", "OP1", "P", "O5'", 108.1, 2.9, 0, 180, 180, 0, 360, 0, 360),
+        AngleDefinition("other", "OP2", "P", "O3'", 108.3, 3.2, 0, 180, 180, 0, 360, 0, 360),
+        AngleDefinition("other", "OP2", "P", "O5'", 108.3, 2.7, 0, 180, 180, 0, 360, 0, 360),
+        AngleDefinition("other", "O3'", "P", "O5'", 104.0, 1.9, 0, 180, 180, 0, 360, 0, 360),
+        AngleDefinition("other", "P", "O3'", "C3'", 119.7, 1.2, 0, 180, 180, 0, 360, 0, 360),
+        AngleDefinition("other", "P", "O5'", "C5'", 120.9, 1.6, 0, 180, 180, 0, 360, 0, 360),
+    ],
 }
 
 
@@ -178,6 +220,7 @@ class Po4Validator(Validator):
 
     def _find_bond_definitions(self, res_name: str, altloc: str) -> List[BondDefinition]:
         # pylint: disable=too-many-return-statements
+        # TODO: fix zeta next and zeta prev for C3'-O3' and C5'-O5'
         zeta = self.geometry.zeta_conformation.get(altloc, self.geometry.zeta_conformation.get("", None))
         alpha = self.geometry.alpha_conformation.get(altloc, self.geometry.alpha_conformation.get("", None))
         print(altloc, zeta, alpha, self.geometry.zeta, self.geometry.alpha)
@@ -193,7 +236,15 @@ class Po4Validator(Validator):
             return self.bonds_definition["PO4==AA_2"]
         if zeta == "sc+" and alpha == "ap":
             return self.bonds_definition["PO4==AA_3"]
-        return []
+        if res_name in ("A", "G"):
+            return self.bonds_definition["other==A_G"]
+        if res_name in ("U", "T", "C"):
+            return self.bonds_definition["other==U_T_C"]
+        if res_name in ("DA", "DG"):
+            return self.bonds_definition["other==DA_DG"]
+        if res_name in ("DU", "DT", "DC"):
+            return self.bonds_definition["other==DU_DT_DC"]
+        raise Exception("Non-standard residue")
 
     def _find_anlge_definitions(self, res_name: str, altloc: str) -> List[AngleDefinition]:
         # pylint: disable=too-many-return-statements
@@ -212,4 +263,4 @@ class Po4Validator(Validator):
             return self.angles_definition["PO4==AA_2"]
         if zeta == "sc+" and alpha == "ap":
             return self.angles_definition["PO4==AA_3"]
-        return []
+        return self.angles_definition["other"]

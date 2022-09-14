@@ -14,5 +14,6 @@ ignore = '''.git,
 [tool.pylint.tests]
 disable = '''
         missing-module-docstring,
-        missing-function-docstring
+        missing-function-docstring,
+        fixme
 '''

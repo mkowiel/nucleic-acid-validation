@@ -17,23 +17,30 @@ def read_structure(pdb_file_path):
 
 
 def validate_structure(structure):
+    residue_cache = []
     records = []
     pdbcode = structure.id
     print(f"# PDB id: {pdbcode}")
     for model in structure:
         for chain in model:
             for residue in chain:
-                res_name = residue.get_resname()
-                if res_name in NUCLEOTIDE_RES_NAMES:
-                    geometry = NucleotideGeometry(pdbcode, model, chain, residue)
-                    geometry.calculate_conformation()
-                    geometry.prepare_report_torsion()
+                # ResidueCacheEntry
+                residue_cache.append(NucleotideGeometry(pdbcode, model, chain, residue))
 
-                    bases = BasesValidator(geometry)
-                    records.extend(bases.validate())
+    for prev_residue, current_residue in zip(residue_cache[1:], residue_cache[:-1]):
+        current_residue.prev_res = prev_residue
+        prev_residue.next_res = current_residue
 
-                    po4 = Po4Validator(geometry)
-                    records.extend(po4.validate())
+    for geometry in residue_cache:
+        if geometry.residue.get_resname() in NUCLEOTIDE_RES_NAMES:
+            geometry.calculate_conformation()
+            geometry.prepare_report_torsion()
+
+            bases = BasesValidator(geometry)
+            records.extend(bases.validate())
+
+            po4 = Po4Validator(geometry)
+            records.extend(po4.validate())
 
     return records
 
@@ -49,5 +56,5 @@ def main(filepath):
 
 
 if __name__ == "__main__":
-    pdb_filepath = sys.argv[1]
-    main(pdb_filepath)
+    PDB_FILEPATH = sys.argv[1]
+    main(PDB_FILEPATH)

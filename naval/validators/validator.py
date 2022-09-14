@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 
@@ -32,19 +32,21 @@ class Validator:
     def _atom_names_angles(self, res_name: str) -> List[AngleDefinition]:
         return self.angles_definition[res_name]
 
+    # pylint: disable=unused-argument
     def _find_bond_definitions(self, res_name: str, altloc: str) -> List[BondDefinition]:
         return self.bonds_definition[res_name]
 
+    # pylint: disable=unused-argument
     def _find_anlge_definitions(self, res_name: str, altloc: str) -> List[AngleDefinition]:
         return self.angles_definition[res_name]
 
-    def _select_bond_definition(self, definitions, atom1: str, atom2: str) -> BondDefinition:
+    def _select_bond_definition(self, definitions, atom1: str, atom2: str) -> Optional[BondDefinition]:
         for definition in definitions:
             if definition.atom1 == atom1 and definition.atom2 == atom2:
                 return definition
         return None
 
-    def _select_angle_definition(self, definitions, atom1: str, atom2: str, atom3: str) -> AngleDefinition:
+    def _select_angle_definition(self, definitions, atom1: str, atom2: str, atom3: str) -> Optional[AngleDefinition]:
         for definition in definitions:
             if definition.atom1 == atom1 and definition.atom2 == atom2 and definition.atom3 == atom3:
                 return definition
@@ -52,7 +54,7 @@ class Validator:
 
     def _validate_bonds(self, res_name: str, resseq: str, chain: Chain) -> List[ValidationRecord]:
         # pylint: disable=too-many-locals
-
+        # pylint: disable=too-many-nested-blocks
         records = []
         for atom_definition in self._atom_names_bonds(res_name):
             if atom_definition.atom1 in chain[resseq] and atom_definition.atom2 in chain[resseq]:
@@ -100,7 +102,7 @@ class Validator:
 
     def _validate_angles(self, res_name: str, resseq: str, chain: Chain) -> List[ValidationRecord]:
         # pylint: disable=too-many-locals
-
+        # pylint: disable=too-many-nested-blocks
         records = []
         for atom_definition in self._atom_names_angles(res_name):
             if (

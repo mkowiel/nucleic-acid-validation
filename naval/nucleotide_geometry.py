@@ -17,6 +17,7 @@ class NucleotideGeometry:
     Class to keep cache torsion angles for given residue
     """
 
+    # pylint: disable=too-many-public-methods
     # pylint: disable=too-many-instance-attributes
     def __init__(self, pdbcode: str, model, chain: Chain, residue: Residue) -> None:
         """Simple container class to keep torsion angles of the residue.
@@ -55,6 +56,10 @@ class NucleotideGeometry:
         self.tau_max: Dict[str, Optional[float]] = {}  # sugar pucker amplitude
         self.pseudorotation: Dict[str, Optional[float]] = {}  # the phase angle of pseudorotation
         self.sugar_conformation: Dict[str, Optional[str]] = {}  # sugar conformation (C2' endo or C3' endo)
+
+        # TODO, move to Geometry/Residue base class
+        self.next_res: Optional[NucleotideGeometry] = None
+        self.prev_res: Optional[NucleotideGeometry] = None
 
     def pick_atoms(self, atom_name: str, relative_position: int):
         relative_residue: Residue = self.chain[self.resseq + relative_position]
@@ -310,3 +315,15 @@ class NucleotideGeometry:
         self._print_torsion("Theta4  (C3'-C4'-O4'-C1'):            ", self.theta4)
         self._print_torsion("Tau_max:                              ", self.tau_max)
         self._print_torsion("Pseudorotation:                       ", self.pseudorotation, self.sugar_conformation)
+
+    def is_terminal(self):
+        return not self.has_next() or not self.has_prev()
+
+    def has_next(self):
+        return self.next_res is not None
+
+    def has_prev(self):
+        return self.prev_res is not None
+
+    def is_canonical(self):
+        return self.res_name not in NUCLEOTIDE_RES_NAMES
