@@ -45,12 +45,12 @@ class CsvPrinter(Printer):
             str(_)
             for _ in (
                 record.validation_type,
-                record.geometry.pdbcode,
-                record.geometry.model.get_id(),
-                record.geometry.chain.get_id(),
-                record.geometry.res_name,
-                record.geometry.resseq,
-                record.geometry.inscode,
+                record.geometry.residue_entry.pdbcode,
+                record.geometry.residue_entry.model.get_id(),
+                record.geometry.residue_entry.chain.get_id(),
+                record.geometry.residue_entry.res_name,
+                record.geometry.residue_entry.resseq,
+                record.geometry.residue_entry.inscode,
                 record.atom1.get_name(),
                 record.atom1.get_altloc(),
                 record.atom2.get_name(),

@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 
-from naval.validation_record import ValidationRecord
 from naval.printer import CsvPrinter
+from naval.validation_record import ValidationRecord
 
 
 def test_csv_printer():

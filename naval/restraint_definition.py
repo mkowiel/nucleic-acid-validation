@@ -11,8 +11,10 @@ class BondDefinition:
 
     __slots__ = (
         "name",
-        "atom1",
-        "atom2",
+        "atom1_name",
+        "atom2_name",
+        "atom1_relative_res_position",
+        "atom2_relative_res_position",
         "csd_target",
         "csd_std",
         "pdb_count",
@@ -27,8 +29,10 @@ class BondDefinition:
     def __init__(
         self,
         name: str,
-        atom1: str,
-        atom2: str,
+        atom1_name: str,
+        atom2_name: str,
+        atom1_relative_res_position: int,
+        atom2_relative_res_position: int,
         csd_target: float,
         csd_std: float,
         pdb_count: Optional[int],
@@ -41,8 +45,10 @@ class BondDefinition:
     ):
         # pylint: disable=too-many-arguments
         self.name = name
-        self.atom1 = atom1
-        self.atom2 = atom2
+        self.atom1_name = atom1_name
+        self.atom2_name = atom2_name
+        self.atom1_relative_res_position = atom1_relative_res_position
+        self.atom2_relative_res_position = atom2_relative_res_position
         self.csd_target = csd_target
         self.csd_std = csd_std
         self.pdb_count = pdb_count
@@ -64,9 +70,12 @@ class AngleDefinition:
 
     __slots__ = (
         "name",
-        "atom1",
-        "atom2",
-        "atom3",
+        "atom1_name",
+        "atom2_name",
+        "atom3_name",
+        "atom1_relative_res_position",
+        "atom2_relative_res_position",
+        "atom3_relative_res_position",
         "csd_target",
         "csd_std",
         "pdb_count",
@@ -81,9 +90,12 @@ class AngleDefinition:
     def __init__(
         self,
         name: str,
-        atom1: str,
-        atom2: str,
-        atom3: str,
+        atom1_name: str,
+        atom2_name: str,
+        atom3_name: str,
+        atom1_relative_res_position: int,
+        atom2_relative_res_position: int,
+        atom3_relative_res_position: int,
         csd_target: float,
         csd_std: float,
         pdb_count: Optional[int],
@@ -95,10 +107,14 @@ class AngleDefinition:
         pdb_4high: Optional[float],
     ):
         # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-locals
         self.name = name
-        self.atom1 = atom1
-        self.atom2 = atom2
-        self.atom3 = atom3
+        self.atom1_name = atom1_name
+        self.atom2_name = atom2_name
+        self.atom3_name = atom3_name
+        self.atom1_relative_res_position = atom1_relative_res_position
+        self.atom2_relative_res_position = atom2_relative_res_position
+        self.atom3_relative_res_position = atom3_relative_res_position
         self.csd_target = csd_target
         self.csd_std = csd_std
         self.pdb_count = pdb_count

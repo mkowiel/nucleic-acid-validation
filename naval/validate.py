@@ -3,11 +3,11 @@ import sys
 
 from Bio.PDB import PDBParser
 
-from naval.nucleotide_geometry import NUCLEOTIDE_RES_NAMES
 from naval.nucleotide_geometry import NucleotideGeometry
+from naval.printer import CsvPrinter
+from naval.residue_cache_entry import ResidueCacheEntry
 from naval.validators.bases_validator import BasesValidator
 from naval.validators.po4_validator import Po4Validator
-from naval.printer import CsvPrinter
 
 
 def read_structure(pdb_file_path):
@@ -24,15 +24,25 @@ def validate_structure(structure):
     for model in structure:
         for chain in model:
             for residue in chain:
-                # ResidueCacheEntry
-                residue_cache.append(NucleotideGeometry(pdbcode, model, chain, residue))
+                residue_cache.append(ResidueCacheEntry(pdbcode, model, chain, residue))
 
     for prev_residue, current_residue in zip(residue_cache[1:], residue_cache[:-1]):
-        current_residue.prev_res = prev_residue
-        prev_residue.next_res = current_residue
+        # TODO: add only when same chain and is not hetatm
+        # TODO: move to residue cache entry
+        # same chain or next seqid or the same with insetion code
+        if current_residue.chain == prev_residue.chain and (
+            abs(current_residue.resseq - prev_residue.resseq) == 1
+            or (
+                current_residue.resseq == prev_residue.resseq
+                and (current_residue.inscode != " " or prev_residue.inscode != " ")
+            )
+        ):
+            current_residue.prev_res = prev_residue
+            prev_residue.next_res = current_residue
 
-    for geometry in residue_cache:
-        if geometry.residue.get_resname() in NUCLEOTIDE_RES_NAMES:
+    for res_entry in residue_cache:
+        if res_entry.is_nucleotide():
+            geometry = NucleotideGeometry(res_entry)
             geometry.calculate_conformation()
             geometry.prepare_report_torsion()
 
