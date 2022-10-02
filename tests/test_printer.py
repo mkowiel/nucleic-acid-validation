@@ -1,13 +1,25 @@
 from unittest.mock import Mock
 
+from Bio.PDB.Atom import Atom
+from Bio.PDB.Residue import Residue
+
 from naval.printer import CsvPrinter
 from naval.validation_record import ValidationRecord
 
 
 def test_csv_printer():
+    res = Residue((" ", 1, " "), "A", 1)
+    atom1 = Atom("OP1", (1.6, 0, 0), 10, 1.0, " ", "OP1", 1, "O")
+    atom2 = Atom("P", (0, 0, 0), 10, 1.0, " ", "P", 2, "P")
+    atom3 = Atom("OP2", (0, 0, 1.6), 10, 1.0, " ", "OP2", 3, "O")
+
+    res.add(atom1)
+    res.add(atom2)
+    res.add(atom3)
+
     records = [
-        ValidationRecord("bond", "test", Mock(), Mock(), Mock(), Mock(), 1.43, 1.40, 0.02, 1.30, 1.50, 1.25, 1.55),
-        ValidationRecord("angle", "test", Mock(), Mock(), Mock(), Mock(), 1.55, 1.40, 0.02, 1.30, 1.50, 1.25, 1.55),
+        ValidationRecord("bond", "test", Mock(), atom1, atom2, None, 1.43, 1.40, 0.02, 1.30, 1.50, 1.25, 1.55),
+        ValidationRecord("angle", "test", Mock(), atom1, atom2, atom3, 1.55, 1.40, 0.02, 1.30, 1.50, 1.25, 1.55),
     ]
 
     printer = CsvPrinter()
