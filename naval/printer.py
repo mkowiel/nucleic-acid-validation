@@ -35,8 +35,9 @@ class CsvPrinter(Printer):
     @classmethod
     def format_header(cls):
         return (
-            "type,pdbcode,modeid,chain,res_name,resseq,inscode,atom1_name,atom1_altloc,"
-            "atom2_name,atom3_altloc,atom1_name,atom3_altloc,calculated,target,preferred,allowed,suspicious,outlier"
+            "type,pdbcode,model_id,chain,atom1_res_name,atom1_resid,atom1_name,atom1_altloc,"
+            "atom2_res_name,atom2_resid,atom2_name,atom2_altloc,atom3_res_name,atom3_resid,"
+            "atom3_name,atom3_altloc,calculated,target,preferred,allowed,suspicious,outlier"
         )
 
     @classmethod
@@ -45,20 +46,25 @@ class CsvPrinter(Printer):
             str(_)
             for _ in (
                 record.validation_type,
-                record.geometry.pdbcode,
-                record.geometry.model.get_id(),
-                record.geometry.chain.get_id(),
-                record.geometry.res_name,
-                record.geometry.resseq,
-                record.geometry.inscode,
+                record.geometry.residue_entry.pdbcode,
+                record.geometry.residue_entry.model.get_id(),
+                record.geometry.residue_entry.chain.get_id(),
+                record.atom1.get_parent().get_resname(),
+                str(record.atom1.get_parent().get_id()[1]) + record.atom1.get_parent().get_id()[2].strip(),
                 record.atom1.get_name(),
-                record.atom1.get_altloc(),
+                record.atom1.get_altloc().strip(),
+                record.atom2.get_parent().get_resname(),
+                str(record.atom2.get_parent().get_id()[1]) + record.atom2.get_parent().get_id()[2].strip(),
                 record.atom2.get_name(),
-                record.atom2.get_altloc(),
+                record.atom2.get_altloc().strip(),
+                record.atom3.get_parent().get_resname() if record.atom3 else "",
+                str(record.atom3.get_parent().get_id()[1]) + record.atom3.get_parent().get_id()[2].strip()
+                if record.atom3
+                else "",
                 record.atom3.get_name() if record.atom3 else "",
-                record.atom3.get_altloc() if record.atom3 else "",
-                record.calculated_value,
-                record.target_value,
+                record.atom3.get_altloc().strip() if record.atom3 else "",
+                round(record.calculated_value, 3 if record.validation_type == "bond" else 1),
+                round(record.target_value, 3 if record.validation_type == "bond" else 1),
                 record.preferred,
                 record.allowed,
                 record.suspicious,

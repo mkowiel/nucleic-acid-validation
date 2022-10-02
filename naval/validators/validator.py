@@ -1,14 +1,12 @@
 from typing import List, Optional
 
 import numpy as np
-
-from Bio.PDB.vectors import calc_angle
 from Bio.PDB import Chain
+from Bio.PDB.vectors import calc_angle
 
-from naval.validation_record import ValidationRecord
 from naval.nucleotide_geometry import NucleotideGeometry
-from naval.restraint_definition import AngleDefinition
-from naval.restraint_definition import BondDefinition
+from naval.restraint_definition import AngleDefinition, BondDefinition
+from naval.validation_record import ValidationRecord
 
 
 class Validator:
@@ -42,13 +40,13 @@ class Validator:
 
     def _select_bond_definition(self, definitions, atom1: str, atom2: str) -> Optional[BondDefinition]:
         for definition in definitions:
-            if definition.atom1 == atom1 and definition.atom2 == atom2:
+            if definition.atom1_name == atom1 and definition.atom2_name == atom2:
                 return definition
         return None
 
     def _select_angle_definition(self, definitions, atom1: str, atom2: str, atom3: str) -> Optional[AngleDefinition]:
         for definition in definitions:
-            if definition.atom1 == atom1 and definition.atom2 == atom2 and definition.atom3 == atom3:
+            if definition.atom1_name == atom1 and definition.atom2_name == atom2 and definition.atom3_name == atom3:
                 return definition
         return None
 
@@ -57,12 +55,13 @@ class Validator:
         # pylint: disable=too-many-nested-blocks
         records = []
         for atom_definition in self._atom_names_bonds(res_name):
-            if atom_definition.atom1 in chain[resseq] and atom_definition.atom2 in chain[resseq]:
-                atom_group1 = chain[resseq][atom_definition.atom1]
-                atom_group2 = chain[resseq][atom_definition.atom2]
-
-                atoms1 = atom_group1.disordered_get_list() if atom_group1.is_disordered() else [atom_group1]
-                atoms2 = atom_group2.disordered_get_list() if atom_group2.is_disordered() else [atom_group2]
+            try:
+                atoms1 = self.geometry.pick_atoms(
+                    atom_definition.atom1_name, atom_definition.atom1_relative_res_position
+                )
+                atoms2 = self.geometry.pick_atoms(
+                    atom_definition.atom2_name, atom_definition.atom2_relative_res_position
+                )
 
                 for atom1 in atoms1:
                     for atom2 in atoms2:
@@ -98,6 +97,8 @@ class Validator:
                                         definition.pdb_4high,
                                     )
                                 )
+            except KeyError:
+                pass
         return records
 
     def _validate_angles(self, res_name: str, resseq: str, chain: Chain) -> List[ValidationRecord]:
@@ -105,18 +106,16 @@ class Validator:
         # pylint: disable=too-many-nested-blocks
         records = []
         for atom_definition in self._atom_names_angles(res_name):
-            if (
-                atom_definition.atom1 in chain[resseq]
-                and atom_definition.atom2 in chain[resseq]
-                and atom_definition.atom3 in chain[resseq]
-            ):
-                atom_group1 = chain[resseq][atom_definition.atom1]
-                atom_group2 = chain[resseq][atom_definition.atom2]
-                atom_group3 = chain[resseq][atom_definition.atom3]
-
-                atoms1 = atom_group1.disordered_get_list() if atom_group1.is_disordered() else [atom_group1]
-                atoms2 = atom_group2.disordered_get_list() if atom_group2.is_disordered() else [atom_group2]
-                atoms3 = atom_group3.disordered_get_list() if atom_group3.is_disordered() else [atom_group3]
+            try:
+                atoms1 = self.geometry.pick_atoms(
+                    atom_definition.atom1_name, atom_definition.atom1_relative_res_position
+                )
+                atoms2 = self.geometry.pick_atoms(
+                    atom_definition.atom2_name, atom_definition.atom2_relative_res_position
+                )
+                atoms3 = self.geometry.pick_atoms(
+                    atom_definition.atom3_name, atom_definition.atom3_relative_res_position
+                )
 
                 for atom1 in atoms1:
                     for atom2 in atoms2:
@@ -177,13 +176,14 @@ class Validator:
                                             definition.pdb_4high,
                                         )
                                     )
-
+            except KeyError:
+                pass
         return records
 
     def validate(self) -> List[ValidationRecord]:
-        res_name = self.geometry.res_name
-        resseq = self.geometry.resseq
-        chain = self.geometry.chain
+        res_name = self.geometry.residue_entry.res_name
+        resseq = self.geometry.residue_entry.resseq
+        chain = self.geometry.residue_entry.chain
 
         records = []
         records.extend(self._validate_bonds(res_name, resseq, chain))

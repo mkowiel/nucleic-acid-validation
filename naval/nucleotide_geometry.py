@@ -1,15 +1,13 @@
 import math
 from typing import Dict, List, Optional
+
 import numpy as np
-
-from Bio.PDB.vectors import calc_dihedral
 from Bio.PDB.Atom import Atom
-from Bio.PDB.Chain import Chain
 from Bio.PDB.Residue import Residue
+from Bio.PDB.vectors import calc_dihedral
 
-
-NUCLEOTIDE_RES_NAMES = ("A", "C", "G", "T", "U", "DA", "DC", "DG", "DT", "DU")
-PURINES_RES_NAMES = ("A", "G", "DA", "DG")
+from naval.nucleotide_definitions import PURINES_RES_NAMES
+from naval.residue_cache_entry import ResidueCacheEntry
 
 
 class NucleotideGeometry:
@@ -19,20 +17,12 @@ class NucleotideGeometry:
 
     # pylint: disable=too-many-public-methods
     # pylint: disable=too-many-instance-attributes
-    def __init__(self, pdbcode: str, model, chain: Chain, residue: Residue) -> None:
+    def __init__(self, residue_entry: ResidueCacheEntry) -> None:
         """Simple container class to keep torsion angles of the residue.
         Calculates torison anles for all alternative conformations.
         Maps torsion angles to string classes.
         """
-
-        self.pdbcode = pdbcode
-        self.model = model
-        self.chain = chain
-        self.residue = residue
-        self.res_name = self.residue.get_resname()
-        self.res_full_id = self.residue.get_id()
-        self.resseq = self.res_full_id[1]
-        self.inscode = self.res_full_id[2]
+        self.residue_entry = residue_entry
 
         self.alpha: Dict[str, Optional[float]] = {}  # O3'(i-1)-P-O5'-C5'
         self.beta: Dict[str, Optional[float]] = {}  # P-O5'-C5'-C4'
@@ -57,12 +47,16 @@ class NucleotideGeometry:
         self.pseudorotation: Dict[str, Optional[float]] = {}  # the phase angle of pseudorotation
         self.sugar_conformation: Dict[str, Optional[str]] = {}  # sugar conformation (C2' endo or C3' endo)
 
-        # TODO, move to Geometry/Residue base class
-        self.next_res: Optional[NucleotideGeometry] = None
-        self.prev_res: Optional[NucleotideGeometry] = None
-
     def pick_atoms(self, atom_name: str, relative_position: int):
-        relative_residue: Residue = self.chain[self.resseq + relative_position]
+        if relative_position == 0:
+            relative_residue: Residue = self.residue_entry.residue
+        elif relative_position == 1:
+            relative_residue = self.residue_entry.get_next().residue
+        elif relative_position == -1:
+            relative_residue = self.residue_entry.get_prev().residue
+        else:
+            raise ValueError("Invalid relative_position")
+
         atom_group: Atom = relative_residue[atom_name]
         return atom_group.disordered_get_list() if atom_group.is_disordered() else [atom_group]
 
@@ -120,7 +114,7 @@ class NucleotideGeometry:
     def calculate_torsions(
         self, atom_names: List[str], atom_relative_positions: List[int]
     ) -> Dict[str, Optional[float]]:
-        if self.residue.is_disordered() == 0:
+        if self.residue_entry.residue.is_disordered() == 0:
             return self._calculate_ordered_torsions(atom_names, atom_relative_positions)
         return self._calculate_disordered_torsions(atom_names, atom_relative_positions)
 
@@ -265,7 +259,7 @@ class NucleotideGeometry:
 
     def calculate_chi(self):
         atoms_names = ["O4'", "C1'", "N1", "C2"]
-        if self.res_name in PURINES_RES_NAMES:
+        if self.residue_entry.res_name in PURINES_RES_NAMES:
             atoms_names = ["O4'", "C1'", "N9", "C4"]
         self.chi = self.calculate_torsions(atoms_names, (0, 0, 0, 0))
 
@@ -300,7 +294,11 @@ class NucleotideGeometry:
             print(f"#\t {name} {_alt_loc} {torsion[alt_loc]} {_conformation}")
 
     def prepare_report_torsion(self):
-        print(f"# Chain: {self.chain.get_id()}, Residue id: {self.resseq}, Residue name: {self.res_name}")
+        print(
+            f"# Chain: {self.residue_entry.chain.get_id()}, "
+            + f"Residue id: {self.residue_entry.resseq}, "
+            + f"Residue name: {self.residue_entry.res_name}"
+        )
         self._print_torsion("Alpha   (O3'(i-1)-P-O5'-C5'):         ", self.alpha, self.alpha_conformation)
         self._print_torsion("Beta    (P-O5'-C5'-C4'):              ", self.beta)
         self._print_torsion("Gamma   (O5'-C5'-C4'-C3'):            ", self.gamma, self.gamma_conformation)
@@ -315,15 +313,3 @@ class NucleotideGeometry:
         self._print_torsion("Theta4  (C3'-C4'-O4'-C1'):            ", self.theta4)
         self._print_torsion("Tau_max:                              ", self.tau_max)
         self._print_torsion("Pseudorotation:                       ", self.pseudorotation, self.sugar_conformation)
-
-    def is_terminal(self):
-        return not self.has_next() or not self.has_prev()
-
-    def has_next(self):
-        return self.next_res is not None
-
-    def has_prev(self):
-        return self.prev_res is not None
-
-    def is_canonical(self):
-        return self.res_name not in NUCLEOTIDE_RES_NAMES
