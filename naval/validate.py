@@ -1,5 +1,6 @@
 import os
 import sys
+from typing import List
 
 from Bio.PDB import PDBParser
 
@@ -16,17 +17,17 @@ def read_structure(pdb_file_path):
     return parser.get_structure(pdbcode, pdb_file_path)
 
 
-def validate_structure(structure):
+def fill_residue_cache(structure, pdbcode) -> List[ResidueCacheEntry]:
     residue_cache = []
-    records = []
-    pdbcode = structure.id
-    print(f"# PDB id: {pdbcode}")
     for model in structure:
         for chain in model:
             for residue in chain:
                 residue_cache.append(ResidueCacheEntry(pdbcode, model, chain, residue))
+    return residue_cache
 
-    for prev_residue, current_residue in zip(residue_cache[1:], residue_cache[:-1]):
+
+def link_residues(residue_cache) -> List[ResidueCacheEntry]:
+    for prev_residue, current_residue in zip(residue_cache[:-1], residue_cache[1:]):
         # TODO: add only when same chain and is not hetatm
         # TODO: move to residue cache entry
         # same chain or next seqid or the same with insetion code
@@ -39,10 +40,20 @@ def validate_structure(structure):
         ):
             current_residue.prev_res = prev_residue
             prev_residue.next_res = current_residue
+    return residue_cache
 
-    for res_entry in residue_cache:
-        if res_entry.is_nucleotide():
-            geometry = NucleotideGeometry(res_entry)
+
+def validate_structure(structure):
+    pdbcode = structure.id
+    print(f"# PDB id: {pdbcode}")
+
+    residue_cache = fill_residue_cache(structure, pdbcode)
+    residue_cache = link_residues(residue_cache)
+
+    records = []
+    for residue_entry in residue_cache:
+        if residue_entry.is_nucleotide():
+            geometry = NucleotideGeometry(residue_entry)
             geometry.calculate_conformation()
             geometry.prepare_report_torsion()
 

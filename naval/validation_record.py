@@ -10,6 +10,9 @@ class ValidationRecord:
     Container class to keep the results of the validation
     """
 
+    # TODO: we could link to restraint definition (BondDefinition and AngleDefinition)
+    #       instead of coping the raw data
+
     # pylint: disable=too-many-instance-attributes
 
     __slots__ = (

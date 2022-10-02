@@ -74,11 +74,11 @@ def test_iterate_struct_5hr7():
     assert len(records) > 0
 
     assert len(filter_records_atoms(records, "angle", "D", "OP1", "P", "OP2")) == 71 - 2 + 1
-    # assert len(filter_records_atoms(records, "angle", "D", "OP1", "P", "O3'")) == 71 - 2 + 1 - 1
+    assert len(filter_records_atoms(records, "angle", "D", "OP1", "P", "O3'")) == 71 - 2 + 1 - 1
 
     assert len(filter_records_bond(records, "D", (" ", 19, " "), "OP1", (" ", 19, " "), "P")) == 1
+
     # if atoms are taken from the same res then it will be greater than 0
-    # TODO: fix atom selection
     assert len(filter_records_bond(records, "D", (" ", 19, " "), "O3'", (" ", 19, " "), "P")) == 0
     assert len(filter_records_bond(records, "D", (" ", 19, " "), "O3'", (" ", 20, " "), "P")) == 1
 
