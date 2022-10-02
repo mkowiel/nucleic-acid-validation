@@ -223,6 +223,14 @@ class Po4Validator(Validator):
         # TODO: fix zeta next and zeta prev for C3'-O3' and C5'-O5' and for angles containing C3' O3' and C5' and O5'
         zeta = self.geometry.zeta_conformation.get(altloc, self.geometry.zeta_conformation.get("", None))
         alpha = self.geometry.alpha_conformation.get(altloc, self.geometry.alpha_conformation.get("", None))
+
+        # at the moment geometry does not have next and prev, res_chace_entry does not link to geometry
+        # prev_zeta = self.geometry.zeta_conformation.get(altloc, self.geometry.zeta_conformation.get("", None))
+        # prev_alpha = self.geometry.alpha_conformation.get(altloc, self.geometry.alpha_conformation.get("", None))
+
+        # next_zeta = self.geometry.zeta_conformation.get(altloc, self.geometry.zeta_conformation.get("", None))
+        # next_alpha = self.geometry.alpha_conformation.get(altloc, self.geometry.alpha_conformation.get("", None))
+
         print(altloc, zeta, alpha, self.geometry.zeta, self.geometry.alpha)
         if zeta == "sc-" and alpha == "sc-":
             return self.bonds_definition["PO4==AS_1"]
