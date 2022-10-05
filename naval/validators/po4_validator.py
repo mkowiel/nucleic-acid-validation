@@ -218,20 +218,27 @@ class Po4Validator(Validator):
     def _atom_names_angles(self, res_name: str) -> List[AngleDefinition]:
         return self.angles_definition["PO4==AS_0"]
 
-    def _find_bond_definitions(self, res_name: str, altloc: str) -> List[BondDefinition]:
+    def _find_bond_definitions(
+        self, res_name: str, altloc: str, atom1_name: str, atom2_name: str
+    ) -> List[BondDefinition]:
         # pylint: disable=too-many-return-statements
+        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-branches
         # TODO: fix zeta next and zeta prev for C3'-O3' and C5'-O5' and for angles containing C3' O3' and C5' and O5'
-        zeta = self.geometry.zeta_conformation.get(altloc, self.geometry.zeta_conformation.get("", None))
-        alpha = self.geometry.alpha_conformation.get(altloc, self.geometry.alpha_conformation.get("", None))
+        if "O3'" in atom1_name and "C3'" == atom2_name:
+            alpha = None
+            zeta = self.geometry.zeta_conformation.get(altloc, self.geometry.zeta_conformation.get("", None))
+            if self.geometry.residue_entry.next_res is not None and self.geometry.residue_entry.next_res.geometry:
+                next_geometry = self.geometry.residue_entry.next_res.geometry
+                alpha = next_geometry.alpha_conformation.get(altloc, next_geometry.alpha_conformation.get("", None))
+        else:
+            alpha = self.geometry.alpha_conformation.get(altloc, self.geometry.alpha_conformation.get("", None))
+            zeta = None
+            if self.geometry.residue_entry.prev_res and self.geometry.residue_entry.prev_res.geometry:
+                prev_geometry = self.geometry.residue_entry.prev_res.geometry
+                zeta = prev_geometry.zeta_conformation.get(altloc, prev_geometry.zeta_conformation.get("", None))
 
-        # at the moment geometry does not have next and prev, res_chace_entry does not link to geometry
-        # prev_zeta = self.geometry.zeta_conformation.get(altloc, self.geometry.zeta_conformation.get("", None))
-        # prev_alpha = self.geometry.alpha_conformation.get(altloc, self.geometry.alpha_conformation.get("", None))
-
-        # next_zeta = self.geometry.zeta_conformation.get(altloc, self.geometry.zeta_conformation.get("", None))
-        # next_alpha = self.geometry.alpha_conformation.get(altloc, self.geometry.alpha_conformation.get("", None))
-
-        print(altloc, zeta, alpha, self.geometry.zeta, self.geometry.alpha)
+        # print(altloc, atom1_name, atom2_name, zeta, alpha)
         if zeta == "sc-" and alpha == "sc-":
             return self.bonds_definition["PO4==AS_1"]
         if zeta == "sc+" and alpha == "sc+":
@@ -254,11 +261,17 @@ class Po4Validator(Validator):
             return self.bonds_definition["other==DU_DT_DC"]
         raise Exception("Non-standard residue")
 
-    def _find_anlge_definitions(self, res_name: str, altloc: str) -> List[AngleDefinition]:
+    def _find_anlge_definitions(
+        self, res_name: str, altloc: str, atom1_name: str, atom2_name: str, atom3_name: str
+    ) -> List[AngleDefinition]:
         # pylint: disable=too-many-return-statements
+        # pylint: disable=too-many-arguments
         # TODO: fix zeta next and zeta prev for C3'-O3' and C5'-O5' and for angles containing C3' O3' and C5' and O5'
-        zeta = self.geometry.zeta_conformation.get(altloc, self.geometry.zeta_conformation.get("", None))
         alpha = self.geometry.alpha_conformation.get(altloc, self.geometry.alpha_conformation.get("", None))
+        zeta = None
+        if self.geometry.residue_entry.prev_res and self.geometry.residue_entry.prev_res.geometry:
+            prev_geometry = self.geometry.residue_entry.prev_res.geometry
+            zeta = prev_geometry.zeta_conformation.get(altloc, prev_geometry.zeta_conformation.get("", None))
 
         if zeta == "sc-" and alpha == "sc-":
             return self.angles_definition["PO4==AS_1"]

@@ -7,6 +7,11 @@ from Bio.PDB.Residue import Residue
 
 from naval.nucleotide_definitions import NUCLEOTIDE_RES_NAMES
 
+if False:  # pylint: disable=using-constant-test
+    # trick for mypy to avoid cyclic imports
+    # pylint: disable=cyclic-import
+    from naval.nucleotide_geometry import NucleotideGeometry
+
 
 class ResidueCacheEntry:
     """
@@ -32,6 +37,7 @@ class ResidueCacheEntry:
         # TODO, move to Geometry/Residue base class
         self.next_res: Optional[ResidueCacheEntry] = None
         self.prev_res: Optional[ResidueCacheEntry] = None
+        self.geometry: "Optional[NucleotideGeometry]" = None
 
     def is_terminal(self):
         return not self.has_next() or not self.has_prev()
