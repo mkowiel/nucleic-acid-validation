@@ -43,19 +43,28 @@ def link_residues(residue_cache) -> List[ResidueCacheEntry]:
     return residue_cache
 
 
+def calculate_geometry(residue_cache):
+    for residue_entry in residue_cache:
+        if residue_entry.is_nucleotide():
+            geometry = NucleotideGeometry(residue_entry)
+            geometry.calculate_conformation()
+            geometry.prepare_report_torsion()
+            residue_entry.geometry = geometry
+    return residue_cache
+
+
 def validate_structure(structure):
     pdbcode = structure.id
     print(f"# PDB id: {pdbcode}")
 
     residue_cache = fill_residue_cache(structure, pdbcode)
     residue_cache = link_residues(residue_cache)
+    residue_cache = calculate_geometry(residue_cache)
 
     records = []
     for residue_entry in residue_cache:
         if residue_entry.is_nucleotide():
-            geometry = NucleotideGeometry(residue_entry)
-            geometry.calculate_conformation()
-            geometry.prepare_report_torsion()
+            geometry = residue_entry.geometry
 
             bases = BasesValidator(geometry)
             records.extend(bases.validate())

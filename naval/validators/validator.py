@@ -31,11 +31,17 @@ class Validator:
         return self.angles_definition[res_name]
 
     # pylint: disable=unused-argument
-    def _find_bond_definitions(self, res_name: str, altloc: str) -> List[BondDefinition]:
+    def _find_bond_definitions(
+        self, res_name: str, altloc: str, atom1_name: str, atom2_name: str
+    ) -> List[BondDefinition]:
         return self.bonds_definition[res_name]
 
     # pylint: disable=unused-argument
-    def _find_anlge_definitions(self, res_name: str, altloc: str) -> List[AngleDefinition]:
+    # pylint: disable=too-many-arguments
+    def _find_anlge_definitions(
+        self, res_name: str, altloc: str, atom1_name: str, atom2_name: str, atom3_name: str
+    ) -> List[AngleDefinition]:
+
         return self.angles_definition[res_name]
 
     def _select_bond_definition(self, definitions, atom1: str, atom2: str) -> Optional[BondDefinition]:
@@ -74,7 +80,7 @@ class Validator:
                             altloc_set.discard(" ")
                             altloc = "" if len(altloc_set) == 0 else altloc_set.pop()
 
-                            definitions = self._find_bond_definitions(res_name, altloc)
+                            definitions = self._find_bond_definitions(res_name, altloc, atom1.name, atom2.name)
                             definition = self._select_bond_definition(definitions, atom1.name, atom2.name)
 
                             dist = round(atom2 - atom1, 3)
@@ -146,7 +152,9 @@ class Validator:
                                 altloc_set.discard(" ")
                                 altloc = "" if len(altloc_set) == 0 else altloc_set.pop()
 
-                                definitions = self._find_anlge_definitions(res_name, altloc)
+                                definitions = self._find_anlge_definitions(
+                                    res_name, altloc, atom1.name, atom2.name, atom3.name
+                                )
                                 definition = self._select_angle_definition(
                                     definitions, atom1.name, atom2.name, atom3.name
                                 )
