@@ -9,6 +9,7 @@ from naval.printer import CsvPrinter
 from naval.residue_cache_entry import ResidueCacheEntry
 from naval.validators.bases_validator import BasesValidator
 from naval.validators.po4_validator import Po4Validator
+from naval.validators.sugar_validator import BasicSugarValidator
 
 
 def read_structure(pdb_file_path):
@@ -71,6 +72,9 @@ def validate_structure(structure):
 
             po4 = Po4Validator(geometry)
             records.extend(po4.validate())
+
+            sugar = BasicSugarValidator(geometry)
+            records.extend(sugar.validate())
 
     return records
 
