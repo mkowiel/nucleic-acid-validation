@@ -2,7 +2,7 @@ import os
 import sys
 from typing import List
 
-from Bio.PDB import PDBParser
+from Bio.PDB import MMCIFParser, PDBParser
 
 from naval.nucleotide_geometry import NucleotideGeometry
 from naval.printer import CsvPrinter
@@ -13,7 +13,10 @@ from naval.validators.sugar_validator import BasicSugarValidator
 
 
 def read_structure(pdb_file_path):
-    parser = PDBParser(PERMISSIVE=1, QUIET=True)
+    if pdb_file_path.endswith("pdb"):
+        parser = PDBParser(PERMISSIVE=1, QUIET=True)
+    elif pdb_file_path.endswith("cif"):
+        parser = MMCIFParser(QUIET=True)
     pdbcode = os.path.basename(pdb_file_path)[0:4]
     return parser.get_structure(pdbcode, pdb_file_path)
 
