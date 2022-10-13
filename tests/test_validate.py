@@ -57,6 +57,20 @@ def test_iterate_struct_1d8g():
     records = validate_structure(struct)
     assert len(records) > 0
 
+    # 8 (base) + (C3'-O3')*2(disorder) + (C5'-O5')*2(disorder) + 7 (sugar) * 2(disorder)
+    assert len(filter_records_resseq(records, "bond", "A", 1)) == (8 + 2 * 2 + (7 * 2))
+    # 10 (base) + 0*2 (PO4) + 14 (sugar) * 2(disorder)
+    assert len(filter_records_resseq(records, "angle", "A", 1)) == 10 + 0 + 14 * 2
+
+    assert len(filter_records_atoms(records, "angle", "A", "C6", "N1", "C2")) == 11
+    assert len(filter_records_atoms(records, "angle", "A", "OP1", "P", "OP2")) == 15
+
+
+def test_iterate_struct_1d8g_cif():
+    struct = read_structure(os.path.dirname(__file__) + "/examples/1d8g.cif")
+    records = validate_structure(struct)
+    assert len(records) > 0
+
     print("\n".join(CsvPrinter().print(records)[0:50]))
 
     # 8 (base) + (C3'-O3')*2(disorder) + (C5'-O5')*2(disorder) + 7 (sugar) * 2(disorder)
