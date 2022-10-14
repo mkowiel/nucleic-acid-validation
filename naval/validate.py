@@ -82,16 +82,20 @@ def validate_structure(structure):
     return records
 
 
-def main(filepath):
+def main(filepath, out_filepath):
     sructure = read_structure(filepath)
     validation_records = validate_structure(sructure)
     printer = CsvPrinter()
     lines = printer.print(validation_records)
     # print or save to file
-    print("\n".join(lines))
+    with open(out_filepath, "w", encoding="utf-8") as out_file:
+        out_file.write("\n".join(lines))
+        out_file.write("\n")
+    # print("\n".join(lines))
     return 0
 
 
 if __name__ == "__main__":
     PDB_FILEPATH = sys.argv[1]
-    main(PDB_FILEPATH)
+    OUT_FILE = sys.argv[2]
+    main(PDB_FILEPATH, OUT_FILE)

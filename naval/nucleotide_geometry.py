@@ -173,6 +173,8 @@ class NucleotideGeometry:
                     self.alpha_conformation[alt_loc] = "ap"
                 else:
                     self.alpha_conformation[alt_loc] = "other"
+            else:
+                self.alpha_conformation[alt_loc] = "undefined"
 
     def calculate_beta(self):
         self.beta = self.calculate_torsions(("P", "O5'", "C5'", "C4'"), (0, 0, 0, 0))
@@ -191,6 +193,8 @@ class NucleotideGeometry:
                     self.gamma_conformation[alt_loc] = "trans"
                 else:
                     self.gamma_conformation[alt_loc] = "other"
+            else:
+                self.gamma_conformation[alt_loc] = "undefined"
 
     def calculate_delta(self):
         self.delta = self.calculate_torsions(("C5'", "C4'", "C3'", "O3'"), (0, 0, 0, 0))
@@ -212,6 +216,8 @@ class NucleotideGeometry:
                     self.zeta_conformation[alt_loc] = "ap"
                 else:
                     self.zeta_conformation[alt_loc] = "other"
+            else:
+                self.zeta_conformation[alt_loc] = "undefined"
 
     def calculate_theta_and_pseudorotation(self):
         self.theta0 = self.calculate_torsions(("C4'", "O4'", "C1'", "C2'"), (0, 0, 0, 0))
@@ -229,23 +235,43 @@ class NucleotideGeometry:
         alt_locs.update(self.theta4.keys())
 
         if "" in alt_locs and len(alt_locs) == 1:
-            pseudorotation, _, tau_max, _ = self._pseudorotation_with_sd(
-                self.theta0[""], self.theta1[""], self.theta2[""], self.theta3[""], self.theta4[""]
-            )
-            self.pseudorotation[""] = pseudorotation
-            self.tau_max[""] = tau_max
+            if (
+                self.theta0[""] is not None
+                and self.theta1[""] is not None
+                and self.theta2[""] is not None
+                and self.theta3[""] is not None
+                and self.theta4[""] is not None
+            ):
+                pseudorotation, _, tau_max, _ = self._pseudorotation_with_sd(
+                    self.theta0[""], self.theta1[""], self.theta2[""], self.theta3[""], self.theta4[""]
+                )
+                self.pseudorotation[""] = pseudorotation
+                self.tau_max[""] = tau_max
+            else:
+                self.pseudorotation[""] = None
+                self.tau_max[""] = None
 
         alt_locs.discard("")
         for alt_loc in alt_locs:
-            pseudorotation, _, tau_max, _ = self._pseudorotation_with_sd(
-                self.theta0.get(alt_loc, self.theta0.get("", None)),
-                self.theta1.get(alt_loc, self.theta1.get("", None)),
-                self.theta2.get(alt_loc, self.theta2.get("", None)),
-                self.theta3.get(alt_loc, self.theta3.get("", None)),
-                self.theta4.get(alt_loc, self.theta4.get("", None)),
-            )
-            self.pseudorotation[alt_loc] = pseudorotation
-            self.tau_max[alt_loc] = tau_max
+            if (
+                self.theta0.get(alt_loc, self.theta0.get("", None)) is not None
+                and self.theta1.get(alt_loc, self.theta1.get("", None)) is not None
+                and self.theta2.get(alt_loc, self.theta2.get("", None)) is not None
+                and self.theta3.get(alt_loc, self.theta3.get("", None)) is not None
+                and self.theta4.get(alt_loc, self.theta4.get("", None)) is not None
+            ):
+                pseudorotation, _, tau_max, _ = self._pseudorotation_with_sd(
+                    self.theta0.get(alt_loc, self.theta0.get("", None)),
+                    self.theta1.get(alt_loc, self.theta1.get("", None)),
+                    self.theta2.get(alt_loc, self.theta2.get("", None)),
+                    self.theta3.get(alt_loc, self.theta3.get("", None)),
+                    self.theta4.get(alt_loc, self.theta4.get("", None)),
+                )
+                self.pseudorotation[alt_loc] = pseudorotation
+                self.tau_max[alt_loc] = tau_max
+            else:
+                self.pseudorotation[alt_loc] = None
+                self.tau_max[alt_loc] = None
 
     def calulate_sugar_conformation(self):
         for alt_loc, angle in self.pseudorotation.items():
@@ -255,7 +281,9 @@ class NucleotideGeometry:
                 elif 0 <= angle <= 36:
                     self.sugar_conformation[alt_loc] = "C3'-endo"
                 else:
-                    self.sugar_conformation[alt_loc] = "Other"
+                    self.sugar_conformation[alt_loc] = "other"
+            else:
+                self.sugar_conformation[alt_loc] = "undefined"
 
     def calculate_chi(self):
         atoms_names = ["O4'", "C1'", "N1", "C2"]
@@ -270,6 +298,8 @@ class NucleotideGeometry:
                     self.chi_conformation[alt_loc] = "syn"
                 else:
                     self.chi_conformation[alt_loc] = "anti"
+            else:
+                self.chi_conformation[alt_loc] = "undefined"
 
     def calculate_conformation(self):
         self.calculate_alpha()
