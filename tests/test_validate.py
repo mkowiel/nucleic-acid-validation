@@ -54,7 +54,7 @@ def filter_records_bond(records, chain, resseq1, atom1, resseq2, atom2):
 
 def test_iterate_struct_1d8g():
     struct = read_structure(os.path.dirname(__file__) + "/examples/1d8g.pdb")
-    records = validate_structure(struct)
+    records, _geometry = validate_structure(struct)
     assert len(records) > 0
 
     # 8 (base) + (C3'-O3')*2(disorder) + (C5'-O5')*2(disorder) + 7 (sugar) * 2(disorder)
@@ -68,7 +68,7 @@ def test_iterate_struct_1d8g():
 
 def test_iterate_struct_1d8g_cif():
     struct = read_structure(os.path.dirname(__file__) + "/examples/1d8g.cif")
-    records = validate_structure(struct)
+    records, _geometry = validate_structure(struct)
     assert len(records) > 0
 
     print("\n".join(CsvPrinter().print(records)[0:50]))
@@ -84,7 +84,7 @@ def test_iterate_struct_1d8g_cif():
 
 def test_iterate_struct_5hr7():
     struct = read_structure(os.path.dirname(__file__) + "/examples/5hr7.pdb")
-    records = validate_structure(struct)
+    records, _geometry = validate_structure(struct)
     assert len(records) > 0
 
     assert len(filter_records_atoms(records, "angle", "D", "OP1", "P", "OP2")) == 71 - 2 + 1

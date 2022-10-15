@@ -103,3 +103,39 @@ class ValidationRecord:
 
     def is_outlier(self):
         return not (self.suspicious or self.allowed or self.preferred)
+
+
+class TorsionRecord:
+    """
+    Container class to keep the results of the torsion angles
+    """
+
+    # pylint: disable=too-few-public-methods
+
+    __slots__ = (
+        "validation_type",
+        "name",
+        "geometry",
+        "alt_loc",
+        "calculated_value",
+        "calculated_value_label",
+    )
+
+    def __init__(
+        self,
+        validation_type: str,
+        name: str,
+        geometry: NucleotideGeometry,
+        alt_loc: str,
+        calculated_value: float,
+        calculated_value_label: str,
+    ) -> None:
+        # pylint: disable=too-many-arguments
+        if validation_type not in ("torsion", "pseudorotation"):
+            raise ValueError("Validation type nees to one of ['torsion', 'pseudorotation']")
+        self.validation_type = validation_type
+        self.name = name
+        self.geometry = geometry
+        self.alt_loc = alt_loc
+        self.calculated_value = calculated_value
+        self.calculated_value_label = calculated_value_label

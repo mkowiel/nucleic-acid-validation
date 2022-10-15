@@ -5,9 +5,10 @@ from typing import List
 from Bio.PDB import MMCIFParser, PDBParser
 
 from naval.nucleotide_geometry import NucleotideGeometry
-from naval.printer import CsvPrinter
+from naval.printer import CsvPrinter, GeometryCsvPrinter
 from naval.residue_cache_entry import ResidueCacheEntry
 from naval.validators.bases_validator import BasesValidator
+from naval.validators.geometry_validator import GeometryValidator
 from naval.validators.po4_validator import Po4Validator
 from naval.validators.sugar_validator import BasicSugarValidator
 
@@ -52,7 +53,7 @@ def calculate_geometry(residue_cache):
         if residue_entry.is_nucleotide():
             geometry = NucleotideGeometry(residue_entry)
             geometry.calculate_conformation()
-            geometry.prepare_report_torsion()
+            # geometry.prepare_report_torsion()
             residue_entry.geometry = geometry
     return residue_cache
 
@@ -65,33 +66,48 @@ def validate_structure(structure):
     residue_cache = link_residues(residue_cache)
     residue_cache = calculate_geometry(residue_cache)
 
-    records = []
+    validation_records = []
+    geometry_records = []
     for residue_entry in residue_cache:
         if residue_entry.is_nucleotide():
             geometry = residue_entry.geometry
 
+            geometry_validator = GeometryValidator(geometry)
+            geometry_records.extend(geometry_validator.validate())
+
             bases = BasesValidator(geometry)
-            records.extend(bases.validate())
+            validation_records.extend(bases.validate())
 
             po4 = Po4Validator(geometry)
-            records.extend(po4.validate())
+            validation_records.extend(po4.validate())
 
             sugar = BasicSugarValidator(geometry)
-            records.extend(sugar.validate())
+            validation_records.extend(sugar.validate())
 
-    return records
+    return validation_records, geometry_records
 
 
-def main(filepath):
+def main(filepath, bond_angle_out_filepath, geometry_out_path):
     sructure = read_structure(filepath)
-    validation_records = validate_structure(sructure)
+    validation_records, geometry_records = validate_structure(sructure)
     printer = CsvPrinter()
     lines = printer.print(validation_records)
-    # print or save to file
-    print("\n".join(lines))
+    # save to file
+    with open(bond_angle_out_filepath, "w", encoding="utf-8") as out_file:
+        out_file.write("\n".join(lines))
+        out_file.write("\n")
+
+    geometry_printer = GeometryCsvPrinter()
+    lines = geometry_printer.print(geometry_records)
+    # save to file
+    with open(geometry_out_path, "w", encoding="utf-8") as out_file:
+        out_file.write("\n".join(lines))
+        out_file.write("\n")
     return 0
 
 
 if __name__ == "__main__":
     PDB_FILEPATH = sys.argv[1]
-    main(PDB_FILEPATH)
+    OUT_FILE = sys.argv[2]
+    GEOMETRY_OUT_PATH = sys.argv[3]
+    main(PDB_FILEPATH, OUT_FILE, GEOMETRY_OUT_PATH)
