@@ -1,6 +1,6 @@
 from typing import List
 
-from naval.validation_record import ValidationRecord
+from naval.validation_record import TorsionRecord, ValidationRecord
 
 
 class Printer:
@@ -72,3 +72,42 @@ class CsvPrinter(Printer):
             )
         )
         return line
+
+
+class GeometryCsvPrinter:
+    """
+    CSV printer converts Torsion Records to lines of text.
+    """
+
+    @classmethod
+    def format_header(cls):
+        return "type,pdbcode,model_id,chain,res_name,resid,name,altloc,calculated,label"
+
+    @classmethod
+    def format_record(cls, record: TorsionRecord):
+        line = ",".join(
+            str(_)
+            for _ in (
+                record.validation_type,
+                record.geometry.residue_entry.pdbcode,
+                record.geometry.residue_entry.model.get_id(),
+                record.geometry.residue_entry.chain.get_id(),
+                record.geometry.residue_entry.res_name,
+                str(record.geometry.residue_entry.resseq) + record.geometry.residue_entry.inscode.strip(),
+                record.alt_loc.strip(),
+                record.name,
+                round(record.calculated_value, 1) if record.calculated_value else "",
+                record.calculated_value_label,
+            )
+        )
+        return line
+
+    @classmethod
+    def print(cls, records: List[TorsionRecord]):
+        lines = []
+        header = cls.format_header()
+        if header:
+            lines.append(header)
+        for record in records:
+            lines.append(cls.format_record(record))
+        return lines
