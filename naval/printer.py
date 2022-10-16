@@ -81,7 +81,7 @@ class GeometryCsvPrinter:
 
     @classmethod
     def format_header(cls):
-        return "type,pdbcode,model_id,chain,res_name,resid,name,altloc,calculated,label"
+        return "type,pdbcode,model_id,chain,res_name,resid,altloc,name,calculated,label"
 
     @classmethod
     def format_record(cls, record: TorsionRecord):
