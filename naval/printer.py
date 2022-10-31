@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 from naval.validation_record import TorsionRecord, ValidationRecord
 
@@ -7,6 +7,8 @@ class Printer:
     """
     Base class for all Printers.
     """
+
+    supported_record_types: Tuple[str] = tuple()  # type: ignore
 
     @classmethod
     def format_header(cls):
@@ -23,14 +25,60 @@ class Printer:
         if header:
             lines.append(header)
         for record in records:
-            lines.append(cls.format_record(record))
+            if record.validation_type in cls.supported_record_types:
+                lines.append(cls.format_record(record))
         return lines
 
 
-class CsvPrinter(Printer):
+class BondsCsvPrinter(Printer):
     """
     CSV printer converts Validation Records to lines of text.
     """
+
+    supported_record_types: Tuple[str] = ("bond",)
+
+    @classmethod
+    def format_header(cls):
+        return (
+            "type,pdbcode,model_id,chain,atom1_res_name,atom1_resid,atom1_name,atom1_altloc,"
+            "atom2_res_name,atom2_resid,atom2_name,atom2_altloc,"
+            "calculated,target,preferred,allowed,suspicious,outlier"
+        )
+
+    @classmethod
+    def format_record(cls, record: ValidationRecord):
+        line = ",".join(
+            str(_)
+            for _ in (
+                record.validation_type,
+                record.geometry.residue_entry.pdbcode,
+                record.geometry.residue_entry.model.get_id(),
+                record.geometry.residue_entry.chain.get_id(),
+                record.atom1.get_parent().get_resname(),
+                str(record.atom1.get_parent().get_id()[1]) + record.atom1.get_parent().get_id()[2].strip(),
+                record.atom1.get_name(),
+                record.atom1.get_altloc().strip(),
+                record.atom2.get_parent().get_resname(),
+                str(record.atom2.get_parent().get_id()[1]) + record.atom2.get_parent().get_id()[2].strip(),
+                record.atom2.get_name(),
+                record.atom2.get_altloc().strip(),
+                round(record.calculated_value, 3),
+                round(record.target_value, 3),
+                record.preferred,
+                record.allowed,
+                record.suspicious,
+                record.outlier,
+            )
+        )
+        return line
+
+
+class AnglesCsvPrinter(Printer):
+    """
+    CSV printer converts Validation Records to lines of text.
+    """
+
+    supported_record_types: Tuple[str] = ("angle",)
 
     @classmethod
     def format_header(cls):
@@ -63,8 +111,8 @@ class CsvPrinter(Printer):
                 else "",
                 record.atom3.get_name() if record.atom3 else "",
                 record.atom3.get_altloc().strip() if record.atom3 else "",
-                round(record.calculated_value, 3 if record.validation_type == "bond" else 1),
-                round(record.target_value, 3 if record.validation_type == "bond" else 1),
+                round(record.calculated_value, 1),
+                round(record.target_value, 1),
                 record.preferred,
                 record.allowed,
                 record.suspicious,
