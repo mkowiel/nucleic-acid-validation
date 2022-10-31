@@ -137,7 +137,7 @@ def main(structure_filepath: str, bonds_out_filepath: str, angles_out_filepath: 
 if __name__ == "__main__":
     if len(sys.argv) < 5:
         print("Usage:\n\tvalidate.py struct_in.pdb|struct_in.cif bonds_out.csv angles_out.csv torsion_out.csv")
-        exit(-1)
+        sys.exit(-1)
     PDB_OR_MMCIF_FILEPATH = sys.argv[1]
     BONDS_OUT_FILE = sys.argv[2]
     AGLES_OUT_FILE = sys.argv[3]

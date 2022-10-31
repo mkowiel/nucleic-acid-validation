@@ -1,6 +1,3 @@
-from typing import Optional
-
-
 class BondDefinition:
     """
     Simple container class for bond definitions
@@ -35,13 +32,14 @@ class BondDefinition:
         atom2_relative_res_position: int,
         csd_target: float,
         csd_std: float,
-        pdb_count: Optional[int],
-        pdb_mean: Optional[float],
-        pdb_std: Optional[float],
-        pdb_3low: Optional[float],
-        pdb_3high: Optional[float],
-        pdb_4low: Optional[float],
-        pdb_4high: Optional[float],
+        pdb_count: int,
+        pdb_mean: float,
+        pdb_std: float,
+        # TODO: rename
+        pdb_3low: float,
+        pdb_3high: float,
+        pdb_4low: float,
+        pdb_4high: float,
     ):
         # pylint: disable=too-many-arguments
         self.name = name
@@ -81,6 +79,7 @@ class AngleDefinition:
         "pdb_count",
         "pdb_mean",
         "pdb_std",
+        # TODO rename
         "pdb_3low",
         "pdb_3high",
         "pdb_4low",
@@ -98,13 +97,13 @@ class AngleDefinition:
         atom3_relative_res_position: int,
         csd_target: float,
         csd_std: float,
-        pdb_count: Optional[int],
-        pdb_mean: Optional[float],
-        pdb_std: Optional[float],
-        pdb_3low: Optional[float],
-        pdb_3high: Optional[float],
-        pdb_4low: Optional[float],
-        pdb_4high: Optional[float],
+        pdb_count: int,
+        pdb_mean: float,
+        pdb_std: float,
+        pdb_3low: float,
+        pdb_3high: float,
+        pdb_4low: float,
+        pdb_4high: float,
     ):
         # pylint: disable=too-many-arguments
         # pylint: disable=too-many-locals

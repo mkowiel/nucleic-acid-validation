@@ -40,9 +40,10 @@ class BondsCsvPrinter(Printer):
     @classmethod
     def format_header(cls):
         return (
-            "type,pdbcode,model_id,chain,atom1_res_name,atom1_resid,atom1_name,atom1_altloc,"
+            "type,pdbcode,model_id,chain,"
+            "atom1_res_name,atom1_resid,atom1_name,atom1_altloc,"
             "atom2_res_name,atom2_resid,atom2_name,atom2_altloc,"
-            "calculated,target,preferred,allowed,suspicious,outlier"
+            "calculated,target,validation_label"
         )
 
     @classmethod
@@ -64,10 +65,7 @@ class BondsCsvPrinter(Printer):
                 record.atom2.get_altloc().strip(),
                 round(record.calculated_value, 3),
                 round(record.target_value, 3),
-                record.preferred,
-                record.allowed,
-                record.suspicious,
-                record.outlier,
+                record.label,
             )
         )
         return line
@@ -83,9 +81,11 @@ class AnglesCsvPrinter(Printer):
     @classmethod
     def format_header(cls):
         return (
-            "type,pdbcode,model_id,chain,atom1_res_name,atom1_resid,atom1_name,atom1_altloc,"
-            "atom2_res_name,atom2_resid,atom2_name,atom2_altloc,atom3_res_name,atom3_resid,"
-            "atom3_name,atom3_altloc,calculated,target,preferred,allowed,suspicious,outlier"
+            "type,pdbcode,model_id,chain,"
+            "atom1_res_name,atom1_resid,atom1_name,atom1_altloc,"
+            "atom2_res_name,atom2_resid,atom2_name,atom2_altloc,"
+            "atom3_res_name,atom3_resid,atom3_name,atom3_altloc,"
+            "calculated,target,validation_label"
         )
 
     @classmethod
@@ -113,10 +113,7 @@ class AnglesCsvPrinter(Printer):
                 record.atom3.get_altloc().strip() if record.atom3 else "",
                 round(record.calculated_value, 1),
                 round(record.target_value, 1),
-                record.preferred,
-                record.allowed,
-                record.suspicious,
-                record.outlier,
+                record.label,
             )
         )
         return line
@@ -129,7 +126,7 @@ class GeometryCsvPrinter:
 
     @classmethod
     def format_header(cls):
-        return "type,pdbcode,model_id,chain,res_name,resid,altloc,name,calculated,label"
+        return "type,pdbcode,model_id,chain,res_name,resid,altloc,name,calculated,validation_label"
 
     @classmethod
     def format_record(cls, record: TorsionRecord):
