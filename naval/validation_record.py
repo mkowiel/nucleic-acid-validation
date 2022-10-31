@@ -83,9 +83,7 @@ class ValidationRecord:
         return self.csd_preferred_left <= self.calculated_value <= self.csd_preferred_right
 
     def is_allowed(self) -> bool:
-        return (
-            False if self.is_preferred() else (self.pdb_allowed_left <= self.calculated_value <= self.pdb_allowed_right)
-        )
+        return False if self.is_preferred() else (self.pdb_allowed_left <= self.calculated_value <= self.pdb_allowed_right)
 
     def is_suspicious(self) -> bool:
         return (

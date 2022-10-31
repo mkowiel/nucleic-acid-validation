@@ -11,7 +11,7 @@ from naval.validation_record import TorsionRecord, ValidationRecord
 from naval.validators.bases_validator import BasesValidator
 from naval.validators.geometry_validator import GeometryValidator
 from naval.validators.po4_validator import Po4Validator
-from naval.validators.sugar_validator import BasicSugarValidator
+from naval.validators.sugar_pucker_validator import SugarPuckerBasedSugarValidator
 
 
 def read_structure(pdb_file_path: str) -> Structure:
@@ -98,7 +98,7 @@ def validate_structure(structure) -> Tuple[List[ValidationRecord], List[TorsionR
                 po4 = Po4Validator(geometry)
                 validation_records.extend(po4.validate())
 
-                sugar = BasicSugarValidator(geometry)
+                sugar = SugarPuckerBasedSugarValidator(geometry)
                 validation_records.extend(sugar.validate())
 
     return validation_records, geometry_records

@@ -111,9 +111,7 @@ class NucleotideGeometry:
                             torsions[alt_loc] = torsion
         return torsions
 
-    def calculate_torsions(
-        self, atom_names: List[str], atom_relative_positions: List[int]
-    ) -> Dict[str, Optional[float]]:
+    def calculate_torsions(self, atom_names: List[str], atom_relative_positions: List[int]) -> Dict[str, Optional[float]]:
         if self.residue_entry.residue.is_disordered() == 0:
             return self._calculate_ordered_torsions(atom_names, atom_relative_positions)
         return self._calculate_disordered_torsions(atom_names, atom_relative_positions)

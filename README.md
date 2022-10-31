@@ -35,6 +35,7 @@ To execute tests suit run:
 
 ## 0.0.4
 
+- Sugar validation based on residue name and sugar pucker (C2'-endo, C3'-endo, other)
 - 4 tier naming change: CSD-preferred, PDB-acceptable, PDB-suspicious, PDB-outlier
 - Separate output file for bonds, angles, and torsion validation records.
 - Improvements in README.md
@@ -50,4 +51,5 @@ on residue name.
 - add options to select sugar validation level (residue, pseudorotation, conformation dependent)
 - do not copy the target values to validation records, we can reuse target definition (may be problematic for functional dependencies)
 - more tests
-
+- handle terminal sugars
+- handle terminal PO4

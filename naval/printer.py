@@ -43,7 +43,7 @@ class BondsCsvPrinter(Printer):
             "type,pdbcode,model_id,chain,"
             "atom1_res_name,atom1_resid,atom1_name,atom1_altloc,"
             "atom2_res_name,atom2_resid,atom2_name,atom2_altloc,"
-            "calculated,target,validation_label"
+            "calculated,target,validation_label,validator_name"
         )
 
     @classmethod
@@ -66,6 +66,7 @@ class BondsCsvPrinter(Printer):
                 round(record.calculated_value, 3),
                 round(record.target_value, 3),
                 record.label,
+                record.name,
             )
         )
         return line
@@ -85,7 +86,7 @@ class AnglesCsvPrinter(Printer):
             "atom1_res_name,atom1_resid,atom1_name,atom1_altloc,"
             "atom2_res_name,atom2_resid,atom2_name,atom2_altloc,"
             "atom3_res_name,atom3_resid,atom3_name,atom3_altloc,"
-            "calculated,target,validation_label"
+            "calculated,target,validation_label,validator_name"
         )
 
     @classmethod
@@ -114,6 +115,7 @@ class AnglesCsvPrinter(Printer):
                 round(record.calculated_value, 1),
                 round(record.target_value, 1),
                 record.label,
+                record.name,
             )
         )
         return line

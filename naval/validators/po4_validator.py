@@ -218,9 +218,7 @@ class Po4Validator(Validator):
     def _atom_names_angles(self, res_name: str) -> List[AngleDefinition]:
         return self.angles_definition["PO4==AS_0"]
 
-    def _find_bond_definitions(
-        self, res_name: str, altloc: str, atom1_name: str, atom2_name: str
-    ) -> List[BondDefinition]:
+    def _find_bond_definitions(self, res_name: str, altloc: str, atom1_name: str, atom2_name: str) -> List[BondDefinition]:
         # pylint: disable=too-many-return-statements
         # pylint: disable=too-many-arguments
         # pylint: disable=too-many-branches
