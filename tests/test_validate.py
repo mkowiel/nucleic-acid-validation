@@ -1,6 +1,6 @@
 import os
 
-from naval.printer import CsvPrinter
+from naval.printer import BondsCsvPrinter
 from naval.validate import read_structure, validate_structure
 
 
@@ -71,7 +71,7 @@ def test_iterate_struct_1d8g_cif():
     records, _geometry = validate_structure(struct)
     assert len(records) > 0
 
-    print("\n".join(CsvPrinter().print(records)[0:50]))
+    print("\n".join(BondsCsvPrinter().print(records)[0:50]))
 
     # 8 (base) + (C3'-O3')*2(disorder) + (C5'-O5')*2(disorder) + 7 (sugar) * 2(disorder)
     assert len(filter_records_resseq(records, "bond", "A", 1)) == (8 + 2 * 2 + (7 * 2))

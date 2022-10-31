@@ -31,9 +31,7 @@ class Validator:
         return self.angles_definition[res_name]
 
     # pylint: disable=unused-argument
-    def _find_bond_definitions(
-        self, res_name: str, altloc: str, atom1_name: str, atom2_name: str
-    ) -> List[BondDefinition]:
+    def _find_bond_definitions(self, res_name: str, altloc: str, atom1_name: str, atom2_name: str) -> List[BondDefinition]:
         return self.bonds_definition[res_name]
 
     # pylint: disable=unused-argument
@@ -62,12 +60,8 @@ class Validator:
         records = []
         for atom_definition in self._atom_names_bonds(res_name):
             try:
-                atoms1 = self.geometry.pick_atoms(
-                    atom_definition.atom1_name, atom_definition.atom1_relative_res_position
-                )
-                atoms2 = self.geometry.pick_atoms(
-                    atom_definition.atom2_name, atom_definition.atom2_relative_res_position
-                )
+                atoms1 = self.geometry.pick_atoms(atom_definition.atom1_name, atom_definition.atom1_relative_res_position)
+                atoms2 = self.geometry.pick_atoms(atom_definition.atom2_name, atom_definition.atom2_relative_res_position)
 
                 for atom1 in atoms1:
                     for atom2 in atoms2:
@@ -113,15 +107,9 @@ class Validator:
         records = []
         for atom_definition in self._atom_names_angles(res_name):
             try:
-                atoms1 = self.geometry.pick_atoms(
-                    atom_definition.atom1_name, atom_definition.atom1_relative_res_position
-                )
-                atoms2 = self.geometry.pick_atoms(
-                    atom_definition.atom2_name, atom_definition.atom2_relative_res_position
-                )
-                atoms3 = self.geometry.pick_atoms(
-                    atom_definition.atom3_name, atom_definition.atom3_relative_res_position
-                )
+                atoms1 = self.geometry.pick_atoms(atom_definition.atom1_name, atom_definition.atom1_relative_res_position)
+                atoms2 = self.geometry.pick_atoms(atom_definition.atom2_name, atom_definition.atom2_relative_res_position)
+                atoms3 = self.geometry.pick_atoms(atom_definition.atom3_name, atom_definition.atom3_relative_res_position)
 
                 for atom1 in atoms1:
                     for atom2 in atoms2:
@@ -132,21 +120,9 @@ class Validator:
                                 or (atom1.get_altloc() == " " and atom2.get_altloc() == atom3.get_altloc())
                                 or (atom2.get_altloc() == " " and atom1.get_altloc() == atom3.get_altloc())
                                 or (atom3.get_altloc() == " " and atom1.get_altloc() == atom2.get_altloc())
-                                or (
-                                    atom1.get_altloc() != " "
-                                    and atom2.get_altloc() == " "
-                                    and atom3.get_altloc() == " "
-                                )
-                                or (
-                                    atom1.get_altloc() == " "
-                                    and atom2.get_altloc() != " "
-                                    and atom3.get_altloc() == " "
-                                )
-                                or (
-                                    atom1.get_altloc() == " "
-                                    and atom2.get_altloc() == " "
-                                    and atom3.get_altloc() != " "
-                                )
+                                or (atom1.get_altloc() != " " and atom2.get_altloc() == " " and atom3.get_altloc() == " ")
+                                or (atom1.get_altloc() == " " and atom2.get_altloc() != " " and atom3.get_altloc() == " ")
+                                or (atom1.get_altloc() == " " and atom2.get_altloc() == " " and atom3.get_altloc() != " ")
                             ):
                                 altloc_set = set([atom1.get_altloc(), atom2.get_altloc(), atom3.get_altloc()])
                                 altloc_set.discard(" ")
@@ -155,9 +131,7 @@ class Validator:
                                 definitions = self._find_anlge_definitions(
                                     res_name, altloc, atom1.name, atom2.name, atom3.name
                                 )
-                                definition = self._select_angle_definition(
-                                    definitions, atom1.name, atom2.name, atom3.name
-                                )
+                                definition = self._select_angle_definition(definitions, atom1.name, atom2.name, atom3.name)
 
                                 angle_value = calc_angle(
                                     atom1.get_vector(),

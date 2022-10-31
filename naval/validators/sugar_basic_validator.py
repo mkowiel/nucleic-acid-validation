@@ -152,9 +152,7 @@ class BasicSugarValidator(Validator):
             return self.angles_definition["sugar_basic==DU_DT_DC"]
         raise Exception("Non-standard residue")
 
-    def _find_bond_definitions(
-        self, res_name: str, altloc: str, atom1_name: str, atom2_name: str
-    ) -> List[BondDefinition]:
+    def _find_bond_definitions(self, res_name: str, altloc: str, atom1_name: str, atom2_name: str) -> List[BondDefinition]:
         if res_name in ("A", "G"):
             return self.bonds_definition["sugar_basic==A_G"]
         if res_name in ("U", "T", "C"):
