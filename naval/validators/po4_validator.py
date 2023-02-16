@@ -258,9 +258,7 @@ class Po4Validator(Validator):
             return self.bonds_definition["other==DU_DT_DC"]
         raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
-    def _find_anlge_definitions(
-        self, res_name: str, altloc: str, atom1_name: str, atom2_name: str, atom3_name: str
-    ) -> List[AngleDefinition]:
+    def _find_anlge_definitions(self, res_name: str, altloc: str, atom1_name: str, atom2_name: str, atom3_name: str) -> List[AngleDefinition]:
         # pylint: disable=too-many-return-statements
         # pylint: disable=too-many-arguments
         # TODO: fix zeta next and zeta prev for C3'-O3' and C5'-O5' and for angles containing C3' O3' and C5' and O5'

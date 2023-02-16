@@ -40,9 +40,7 @@ class Validator:
 
     # pylint: disable=unused-argument
     # pylint: disable=too-many-arguments
-    def _find_anlge_definitions(
-        self, res_name: str, altloc: str, atom1_name: str, atom2_name: str, atom3_name: str
-    ) -> List[AngleDefinition]:
+    def _find_anlge_definitions(self, res_name: str, altloc: str, atom1_name: str, atom2_name: str, atom3_name: str) -> List[AngleDefinition]:
         return self.angles_definition[res_name]
 
     def _select_bond_definition(self, definitions, atom1: str, atom2: str) -> Optional[BondDefinition]:
