@@ -2,7 +2,7 @@ from typing import List
 
 from naval.nucleotide_geometry import NucleotideGeometry
 from naval.restraint_definition import AngleDefinition, BondDefinition
-from naval.validators.validator import Validator
+from naval.validators.validator import NonStandardResidueException, Validator
 
 BASIC_SUGAR_BONDS = {
     "sugar_basic==A_G": [
@@ -139,7 +139,7 @@ class BasicSugarValidator(Validator):
             return self.bonds_definition["sugar_basic==DA_DG"]
         if res_name in ("DU", "DT", "DC"):
             return self.bonds_definition["sugar_basic==DU_DT_DC"]
-        raise Exception("Non-standard residue")
+        raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
     def _atom_names_angles(self, res_name: str) -> List[AngleDefinition]:
         if res_name in ("A", "G"):
@@ -150,7 +150,7 @@ class BasicSugarValidator(Validator):
             return self.angles_definition["sugar_basic==DA_DG"]
         if res_name in ("DU", "DT", "DC"):
             return self.angles_definition["sugar_basic==DU_DT_DC"]
-        raise Exception("Non-standard residue")
+        raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
     def _find_bond_definitions(self, res_name: str, altloc: str, atom1_name: str, atom2_name: str) -> List[BondDefinition]:
         if res_name in ("A", "G"):
@@ -161,7 +161,7 @@ class BasicSugarValidator(Validator):
             return self.bonds_definition["sugar_basic==DA_DG"]
         if res_name in ("DU", "DT", "DC"):
             return self.bonds_definition["sugar_basic==DU_DT_DC"]
-        raise Exception("Non-standard residue")
+        raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
     def _find_anlge_definitions(
         self, res_name: str, altloc: str, atom1_name: str, atom2_name: str, atom3_name: str
@@ -175,4 +175,4 @@ class BasicSugarValidator(Validator):
             return self.angles_definition["sugar_basic==DA_DG"]
         if res_name in ("DU", "DT", "DC"):
             return self.angles_definition["sugar_basic==DU_DT_DC"]
-        raise Exception("Non-standard residue")
+        raise NonStandardResidueException(f"Non-standard residue: {res_name}")

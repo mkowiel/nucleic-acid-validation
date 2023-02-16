@@ -1,10 +1,10 @@
 [tool.black]
 target-version = ['py36', 'py37', 'py38', 'py39']
-line-length = 125
+line-length = 135
 include_trailing_comma = false
 
 [tool.pylint.format]
-max-line-length = 125
+max-line-length = 135
 
 [tool.pylint.MASTER]
 init-hook="import os, sys; sys.path.insert(0, os.path.abspath(os.path.dirname('.')))"

@@ -3,10 +3,9 @@ from typing import List
 from naval.nucleotide_geometry import NucleotideGeometry
 from naval.restraint_definition import AngleDefinition, BondDefinition
 from naval.validators.sugar_basic_validator import BASIC_SUGAR_ANGLES, BASIC_SUGAR_BONDS
-from naval.validators.validator import Validator
+from naval.validators.validator import NonStandardResidueException, Validator
 
 # pylint: disable=too-many-lines
-
 SUGAR_PUCER_BASED_SUGAR_BONDS = {
     "pucker==A_G_C2p_endo": [
         BondDefinition("pucker==A_G_C2p_endo", "C1'", "C2'", 0, 0, 1.528, 0.010, 211232, 1.524, 0.006, 1.494, 1.545, 1.470, 1.569),
@@ -16,7 +15,7 @@ SUGAR_PUCER_BASED_SUGAR_BONDS = {
         BondDefinition("pucker==A_G_C2p_endo", "C1'", "O4'", 0, 0, 1.413, 0.008, 211232, 1.412, 0.006, 1.385, 1.431, 1.360, 1.515),
         BondDefinition("pucker==A_G_C2p_endo", "C4'", "C5'", 0, 0, 1.510, 0.010, 211228, 1.507, 0.008, 1.474, 1.535, 1.449, 1.563),
         BondDefinition("pucker==A_G_C2p_endo", "C2'", "O2'", 0, 0, 1.410, 0.009, 211143, 1.411, 0.004, 1.388, 1.430, 1.360, 1.469),
-        BondDefinition("pucker==A_G_C2p_endo", "C1'", "N9",  0, 0, 1.457, 0.011, 211220, 1.463, 0.007, 1.431, 1.489, 1.385, 1.514),
+        BondDefinition("pucker==A_G_C2p_endo", "C1'", "N9", 0, 0, 1.457, 0.011, 211220, 1.463, 0.007, 1.431, 1.489, 1.385, 1.514),
     ],
     "pucker==A_G_C3p_endo": [
         BondDefinition("pucker==A_G_C3p_endo", "C1'", "C2'", 0, 0, 1.533, 0.012, 1212816, 1.527, 0.005, 1.502, 1.545, 1.482, 1.561),
@@ -26,7 +25,7 @@ SUGAR_PUCER_BASED_SUGAR_BONDS = {
         BondDefinition("pucker==A_G_C3p_endo", "C1'", "O4'", 0, 0, 1.413, 0.009, 1212816, 1.412, 0.005, 1.389, 1.433, 1.374, 1.449),
         BondDefinition("pucker==A_G_C3p_endo", "C4'", "C5'", 0, 0, 1.504, 0.009, 1212808, 1.506, 0.007, 1.478, 1.531, 1.461, 1.559),
         BondDefinition("pucker==A_G_C3p_endo", "C2'", "O2'", 0, 0, 1.416, 0.009, 1212731, 1.418, 0.004, 1.396, 1.434, 1.377, 1.457),
-        BondDefinition("pucker==A_G_C3p_endo", "C1'", "N9",  0, 0, 1.470, 0.011, 1212763, 1.472, 0.007, 1.442, 1.497, 1.403, 1.519),
+        BondDefinition("pucker==A_G_C3p_endo", "C1'", "N9", 0, 0, 1.470, 0.011, 1212763, 1.472, 0.007, 1.442, 1.497, 1.403, 1.519),
     ],
     "pucker==A_G_other": [
         BondDefinition("pucker==A_G_other", "C1'", "C2'", 0, 0, 1.541, 0.010, 69590, 1.527, 0.008, 1.492, 1.553, 1.463, 1.577),
@@ -36,7 +35,7 @@ SUGAR_PUCER_BASED_SUGAR_BONDS = {
         BondDefinition("pucker==A_G_other", "C1'", "O4'", 0, 0, 1.421, 0.010, 69590, 1.407, 0.009, 1.375, 1.435, 1.341, 1.522),
         BondDefinition("pucker==A_G_other", "C4'", "C5'", 0, 0, 1.506, 0.007, 69575, 1.508, 0.009, 1.471, 1.541, 1.445, 1.566),
         BondDefinition("pucker==A_G_other", "C2'", "O2'", 0, 0, 1.413, 0.008, 69555, 1.416, 0.006, 1.388, 1.438, 1.360, 1.508),
-        BondDefinition("pucker==A_G_other", "C1'", "N9",  0, 0, 1.454, 0.007, 69565, 1.470, 0.010, 1.432, 1.510, 1.374, 1.580),
+        BondDefinition("pucker==A_G_other", "C1'", "N9", 0, 0, 1.454, 0.007, 69565, 1.470, 0.010, 1.432, 1.510, 1.374, 1.580),
     ],
     "pucker==U_T_C_C2p_endo": [
         BondDefinition("pucker==U_T_C_C2p_endo", "C1'", "C2'", 0, 0, 1.531, 0.010, 128831, 1.524, 0.006, 1.497, 1.546, 1.475, 1.570),
@@ -46,7 +45,7 @@ SUGAR_PUCER_BASED_SUGAR_BONDS = {
         BondDefinition("pucker==U_T_C_C2p_endo", "C1'", "O4'", 0, 0, 1.411, 0.008, 128831, 1.413, 0.005, 1.386, 1.431, 1.373, 1.456),
         BondDefinition("pucker==U_T_C_C2p_endo", "C4'", "C5'", 0, 0, 1.508, 0.008, 128829, 1.508, 0.007, 1.476, 1.535, 1.454, 1.551),
         BondDefinition("pucker==U_T_C_C2p_endo", "C2'", "O2'", 0, 0, 1.408, 0.008, 128821, 1.412, 0.004, 1.391, 1.429, 1.373, 1.452),
-        BondDefinition("pucker==U_T_C_C2p_endo", "C1'", "N1",  0, 0, 1.471, 0.010, 128823, 1.471, 0.010, 1.436, 1.535, 1.416, 1.564),
+        BondDefinition("pucker==U_T_C_C2p_endo", "C1'", "N1", 0, 0, 1.471, 0.010, 128823, 1.471, 0.010, 1.436, 1.535, 1.416, 1.564),
     ],
     "pucker==U_T_C_C3p_endo": [
         BondDefinition("pucker==U_T_C_C3p_endo", "C1'", "C2'", 0, 0, 1.533, 0.009, 967220, 1.528, 0.005, 1.502, 1.544, 1.484, 1.560),
@@ -56,7 +55,7 @@ SUGAR_PUCER_BASED_SUGAR_BONDS = {
         BondDefinition("pucker==U_T_C_C3p_endo", "C1'", "O4'", 0, 0, 1.411, 0.007, 967220, 1.412, 0.005, 1.390, 1.434, 1.375, 1.449),
         BondDefinition("pucker==U_T_C_C3p_endo", "C4'", "C5'", 0, 0, 1.507, 0.007, 967203, 1.506, 0.006, 1.478, 1.530, 1.459, 1.549),
         BondDefinition("pucker==U_T_C_C3p_endo", "C2'", "O2'", 0, 0, 1.416, 0.008, 967196, 1.418, 0.004, 1.396, 1.434, 1.378, 1.455),
-        BondDefinition("pucker==U_T_C_C3p_endo", "C1'", "N1",  0, 0, 1.488, 0.010, 967105, 1.480, 0.011, 1.440, 1.547, 1.417, 1.584),
+        BondDefinition("pucker==U_T_C_C3p_endo", "C1'", "N1", 0, 0, 1.488, 0.010, 967105, 1.480, 0.011, 1.440, 1.547, 1.417, 1.584),
     ],
     "pucker==DA_DG_C2p_endo": [
         BondDefinition("pucker==DA_DG_C2p_endo", "C1'", "C2'", 0, 0, 1.517, 0.008, 66089, 1.520, 0.006, 1.493, 1.550, 1.464, 1.591),
@@ -65,7 +64,7 @@ SUGAR_PUCER_BASED_SUGAR_BONDS = {
         BondDefinition("pucker==DA_DG_C2p_endo", "C4'", "O4'", 0, 0, 1.446, 0.009, 66089, 1.451, 0.005, 1.426, 1.477, 1.395, 1.528),
         BondDefinition("pucker==DA_DG_C2p_endo", "C1'", "O4'", 0, 0, 1.421, 0.011, 66089, 1.415, 0.008, 1.387, 1.458, 1.352, 1.490),
         BondDefinition("pucker==DA_DG_C2p_endo", "C4'", "C5'", 0, 0, 1.511, 0.008, 66057, 1.515, 0.007, 1.487, 1.543, 1.442, 1.574),
-        BondDefinition("pucker==DA_DG_C2p_endo", "C1'", "N9",  0, 0, 1.456, 0.008, 66077, 1.461, 0.007, 1.428, 1.491, 1.385, 1.523),
+        BondDefinition("pucker==DA_DG_C2p_endo", "C1'", "N9", 0, 0, 1.456, 0.008, 66077, 1.461, 0.007, 1.428, 1.491, 1.385, 1.523),
     ],
     "pucker==DA_DG_C3p_endo": [
         BondDefinition("pucker==DA_DG_C3p_endo", "C1'", "C2'", 0, 0, 1.528, 0.011, 7861, 1.526, 0.009, 1.486, 1.561, 1.457, 1.577),
@@ -74,7 +73,7 @@ SUGAR_PUCER_BASED_SUGAR_BONDS = {
         BondDefinition("pucker==DA_DG_C3p_endo", "C4'", "O4'", 0, 0, 1.443, 0.008, 7861, 1.445, 0.007, 1.409, 1.483, 1.398, 1.510),
         BondDefinition("pucker==DA_DG_C3p_endo", "C1'", "O4'", 0, 0, 1.420, 0.013, 7861, 1.419, 0.008, 1.390, 1.457, 1.380, 1.484),
         BondDefinition("pucker==DA_DG_C3p_endo", "C4'", "C5'", 0, 0, 1.505, 0.008, 7858, 1.514, 0.008, 1.480, 1.549, 1.430, 1.565),
-        BondDefinition("pucker==DA_DG_C3p_endo", "C1'", "N9",  0, 0, 1.467, 0.013, 7858, 1.461, 0.008, 1.425, 1.496, 1.397, 1.513),
+        BondDefinition("pucker==DA_DG_C3p_endo", "C1'", "N9", 0, 0, 1.467, 0.013, 7858, 1.461, 0.008, 1.425, 1.496, 1.397, 1.513),
     ],
     "pucker==DA_DG_other": [
         BondDefinition("pucker==DA_DG_other", "C1'", "C2'", 0, 0, 1.525, 0.011, 27049, 1.523, 0.008, 1.490, 1.553, 1.452, 1.583),
@@ -83,7 +82,7 @@ SUGAR_PUCER_BASED_SUGAR_BONDS = {
         BondDefinition("pucker==DA_DG_other", "C4'", "O4'", 0, 0, 1.438, 0.006, 27049, 1.445, 0.007, 1.412, 1.476, 1.380, 1.513),
         BondDefinition("pucker==DA_DG_other", "C1'", "O4'", 0, 0, 1.427, 0.011, 27049, 1.410, 0.009, 1.378, 1.448, 1.352, 1.481),
         BondDefinition("pucker==DA_DG_other", "C4'", "C5'", 0, 0, 1.504, 0.006, 27000, 1.514, 0.008, 1.478, 1.550, 1.442, 1.590),
-        BondDefinition("pucker==DA_DG_other", "C1'", "N9",  0, 0, 1.454, 0.010, 27034, 1.461, 0.007, 1.422, 1.494, 1.391, 1.575),
+        BondDefinition("pucker==DA_DG_other", "C1'", "N9", 0, 0, 1.454, 0.010, 27034, 1.461, 0.007, 1.422, 1.494, 1.391, 1.575),
     ],
     "pucker==DU_DT_DC_C2p_endo": [
         BondDefinition("pucker==DU_DT_DC_C2p_endo", "C1'", "C2'", 0, 0, 1.519, 0.010, 49389, 1.520, 0.006, 1.495, 1.550, 1.468, 1.625),
@@ -110,7 +109,7 @@ SUGAR_PUCER_BASED_SUGAR_BONDS = {
         BondDefinition("pucker==DU_DT_DC_other", "C4'", "O4'", 0, 0, 1.438, 0.008, 42575, 1.444, 0.007, 1.412, 1.470, 1.372, 1.499),
         BondDefinition("pucker==DU_DT_DC_other", "C1'", "O4'", 0, 0, 1.413, 0.016, 42575, 1.409, 0.009, 1.378, 1.451, 1.296, 1.493),
         BondDefinition("pucker==DU_DT_DC_other", "C4'", "C5'", 0, 0, 1.509, 0.010, 42539, 1.514, 0.007, 1.481, 1.544, 1.418, 1.583),
-        BondDefinition("pucker==DU_DT_DC_other", "C1'", "N1",  0, 0, 1.472, 0.008, 42520, 1.489, 0.017, 1.426, 1.561, 1.344, 1.617),
+        BondDefinition("pucker==DU_DT_DC_other", "C1'", "N1", 0, 0, 1.472, 0.008, 42520, 1.489, 0.017, 1.426, 1.561, 1.344, 1.617),
     ],
 }
 
@@ -329,7 +328,7 @@ class SugarPuckerBasedSugarValidator(Validator):
             return self.bonds_definition["pucker==DA_DG_C2p_endo"]
         if res_name in ("DU", "DT", "DC"):
             return self.bonds_definition["pucker==DU_DT_DC_C2p_endo"]
-        raise Exception("Non-standard residue")
+        raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
     def _atom_names_angles(self, res_name: str) -> List[AngleDefinition]:
         if res_name in ("A", "G"):
@@ -340,7 +339,7 @@ class SugarPuckerBasedSugarValidator(Validator):
             return self.angles_definition["pucker==DA_DG_C2p_endo"]
         if res_name in ("DU", "DT", "DC"):
             return self.angles_definition["pucker==DU_DT_DC_C2p_endo"]
-        raise Exception("Non-standard residue")
+        raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
     def _find_bond_definitions(self, res_name: str, altloc: str, atom1_name: str, atom2_name: str) -> List[BondDefinition]:
         # pylint: disable=too-many-return-statements
@@ -356,7 +355,7 @@ class SugarPuckerBasedSugarValidator(Validator):
                 return self.bonds_definition["pucker==DA_DG_C2p_endo"]
             if res_name in ("DU", "DT", "DC"):
                 return self.bonds_definition["pucker==DU_DT_DC_C2p_endo"]
-            raise Exception("Non-standard residue")
+            raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
         if sugar_conformation == "C3'-endo":
             if res_name in ("A", "G"):
@@ -367,7 +366,7 @@ class SugarPuckerBasedSugarValidator(Validator):
                 return self.bonds_definition["pucker==DA_DG_C3p_endo"]
             if res_name in ("DU", "DT", "DC"):
                 return self.bonds_definition["pucker==DU_DT_DC_C3p_endo"]
-            raise Exception("Non-standard residue")
+            raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
         if sugar_conformation == "other":
             if res_name in ("A", "G"):
@@ -379,7 +378,7 @@ class SugarPuckerBasedSugarValidator(Validator):
                 return self.bonds_definition["pucker==DA_DG_other"]
             if res_name in ("DU", "DT", "DC"):
                 return self.bonds_definition["pucker==DU_DT_DC_other"]
-            raise Exception("Non-standard residue")
+            raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
         if res_name in ("A", "G"):
             return self.basic_bonds_definition["sugar_basic==A_G"]
@@ -390,7 +389,7 @@ class SugarPuckerBasedSugarValidator(Validator):
         if res_name in ("DU", "DT", "DC"):
             return self.basic_bonds_definition["sugar_basic==DU_DT_DC"]
 
-        raise Exception("Non-standard residue")
+        raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
     def _find_anlge_definitions(
         self, res_name: str, altloc: str, atom1_name: str, atom2_name: str, atom3_name: str
@@ -410,7 +409,7 @@ class SugarPuckerBasedSugarValidator(Validator):
                 return self.angles_definition["pucker==DA_DG_C2p_endo"]
             if res_name in ("DU", "DT", "DC"):
                 return self.angles_definition["pucker==DU_DT_DC_C2p_endo"]
-            raise Exception("Non-standard residue")
+            raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
         if sugar_conformation == "C3'-endo":
             if res_name in ("A", "G"):
@@ -421,7 +420,7 @@ class SugarPuckerBasedSugarValidator(Validator):
                 return self.angles_definition["pucker==DA_DG_C3p_endo"]
             if res_name in ("DU", "DT", "DC"):
                 return self.angles_definition["pucker==DU_DT_DC_C3p_endo"]
-            raise Exception("Non-standard residue")
+            raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
         if sugar_conformation == "other":
             if res_name in ("A", "G"):
@@ -433,7 +432,7 @@ class SugarPuckerBasedSugarValidator(Validator):
                 return self.angles_definition["pucker==DA_DG_other"]
             if res_name in ("DU", "DT", "DC"):
                 return self.angles_definition["pucker==DU_DT_DC_other"]
-            raise Exception("Non-standard residue")
+            raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
         if res_name in ("A", "G"):
             return self.basic_angles_definition["sugar_basic==A_G"]
@@ -444,4 +443,4 @@ class SugarPuckerBasedSugarValidator(Validator):
         if res_name in ("DU", "DT", "DC"):
             return self.basic_angles_definition["sugar_basic==DU_DT_DC"]
 
-        raise Exception("Non-standard residue")
+        raise NonStandardResidueException(f"Non-standard residue: {res_name}")

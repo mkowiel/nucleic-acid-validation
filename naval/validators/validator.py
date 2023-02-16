@@ -9,6 +9,10 @@ from naval.restraint_definition import AngleDefinition, BondDefinition
 from naval.validation_record import ValidationRecord
 
 
+class NonStandardResidueException(Exception):
+    """Raise when non canonical residue is passed to Validator"""
+
+
 class Validator:
     """
     Base validator class
@@ -39,7 +43,6 @@ class Validator:
     def _find_anlge_definitions(
         self, res_name: str, altloc: str, atom1_name: str, atom2_name: str, atom3_name: str
     ) -> List[AngleDefinition]:
-
         return self.angles_definition[res_name]
 
     def _select_bond_definition(self, definitions, atom1: str, atom2: str) -> Optional[BondDefinition]:
@@ -65,11 +68,7 @@ class Validator:
 
                 for atom1 in atoms1:
                     for atom2 in atoms2:
-                        if (
-                            atom1.get_altloc() == atom2.get_altloc()
-                            or atom1.get_altloc() == " "
-                            or atom2.get_altloc() == " "
-                        ):
+                        if atom1.get_altloc() == atom2.get_altloc() or atom1.get_altloc() == " " or atom2.get_altloc() == " ":
                             altloc_set = set([atom1.get_altloc(), atom2.get_altloc()])
                             altloc_set.discard(" ")
                             altloc = "" if len(altloc_set) == 0 else altloc_set.pop()
@@ -128,9 +127,7 @@ class Validator:
                                 altloc_set.discard(" ")
                                 altloc = "" if len(altloc_set) == 0 else altloc_set.pop()
 
-                                definitions = self._find_anlge_definitions(
-                                    res_name, altloc, atom1.name, atom2.name, atom3.name
-                                )
+                                definitions = self._find_anlge_definitions(res_name, altloc, atom1.name, atom2.name, atom3.name)
                                 definition = self._select_angle_definition(definitions, atom1.name, atom2.name, atom3.name)
 
                                 angle_value = calc_angle(
