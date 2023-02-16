@@ -48,10 +48,7 @@ def link_residues(residue_cache: List[ResidueCacheEntry]) -> List[ResidueCacheEn
         # same chain or next seqid or the same with insetion code
         if current_residue.chain == prev_residue.chain and (
             abs(current_residue.resseq - prev_residue.resseq) == 1
-            or (
-                current_residue.resseq == prev_residue.resseq
-                and (current_residue.inscode != " " or prev_residue.inscode != " ")
-            )
+            or (current_residue.resseq == prev_residue.resseq and (current_residue.inscode != " " or prev_residue.inscode != " "))
         ):
             current_residue.prev_res = prev_residue
             prev_residue.next_res = current_residue
