@@ -20,7 +20,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
     - name: Tox cache
-      uses: actions/cache@3
+      uses: actions/cache@v3
       with:
         path: .tox
         key: tos-${{ matrix.os }}-python-${{ matrix.python }}-${{ hashFiles('**/tox.ini')}}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('requirements.txt') }}
