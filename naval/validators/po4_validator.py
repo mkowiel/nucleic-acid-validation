@@ -2,7 +2,7 @@ from typing import List
 
 from naval.nucleotide_geometry import NucleotideGeometry
 from naval.restraint_definition import AngleDefinition, BondDefinition
-from naval.validators.validator import Validator
+from naval.validators.validator import NonStandardResidueException, Validator
 
 # TODO: maybe  "O3'", "C3'" relative positions should be -1, -1
 PO4_BONDS = {
@@ -256,7 +256,7 @@ class Po4Validator(Validator):
             return self.bonds_definition["other==DA_DG"]
         if res_name in ("DU", "DT", "DC"):
             return self.bonds_definition["other==DU_DT_DC"]
-        raise Exception("Non-standard residue")
+        raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
     def _find_anlge_definitions(
         self, res_name: str, altloc: str, atom1_name: str, atom2_name: str, atom3_name: str

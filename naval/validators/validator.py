@@ -9,6 +9,10 @@ from naval.restraint_definition import AngleDefinition, BondDefinition
 from naval.validation_record import ValidationRecord
 
 
+class NonStandardResidueException(Exception):
+    """Raise when non canonical residue is passed to Validator"""
+
+
 class Validator:
     """
     Base validator class

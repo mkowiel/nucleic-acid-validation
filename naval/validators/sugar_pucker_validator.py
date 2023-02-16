@@ -3,7 +3,7 @@ from typing import List
 from naval.nucleotide_geometry import NucleotideGeometry
 from naval.restraint_definition import AngleDefinition, BondDefinition
 from naval.validators.sugar_basic_validator import BASIC_SUGAR_ANGLES, BASIC_SUGAR_BONDS
-from naval.validators.validator import Validator
+from naval.validators.validator import NonStandardResidueException, Validator
 
 # pylint: disable=too-many-lines
 SUGAR_PUCER_BASED_SUGAR_BONDS = {
@@ -328,7 +328,7 @@ class SugarPuckerBasedSugarValidator(Validator):
             return self.bonds_definition["pucker==DA_DG_C2p_endo"]
         if res_name in ("DU", "DT", "DC"):
             return self.bonds_definition["pucker==DU_DT_DC_C2p_endo"]
-        raise Exception("Non-standard residue")
+        raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
     def _atom_names_angles(self, res_name: str) -> List[AngleDefinition]:
         if res_name in ("A", "G"):
@@ -339,7 +339,7 @@ class SugarPuckerBasedSugarValidator(Validator):
             return self.angles_definition["pucker==DA_DG_C2p_endo"]
         if res_name in ("DU", "DT", "DC"):
             return self.angles_definition["pucker==DU_DT_DC_C2p_endo"]
-        raise Exception("Non-standard residue")
+        raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
     def _find_bond_definitions(self, res_name: str, altloc: str, atom1_name: str, atom2_name: str) -> List[BondDefinition]:
         # pylint: disable=too-many-return-statements
@@ -355,7 +355,7 @@ class SugarPuckerBasedSugarValidator(Validator):
                 return self.bonds_definition["pucker==DA_DG_C2p_endo"]
             if res_name in ("DU", "DT", "DC"):
                 return self.bonds_definition["pucker==DU_DT_DC_C2p_endo"]
-            raise Exception("Non-standard residue")
+            raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
         if sugar_conformation == "C3'-endo":
             if res_name in ("A", "G"):
@@ -366,7 +366,7 @@ class SugarPuckerBasedSugarValidator(Validator):
                 return self.bonds_definition["pucker==DA_DG_C3p_endo"]
             if res_name in ("DU", "DT", "DC"):
                 return self.bonds_definition["pucker==DU_DT_DC_C3p_endo"]
-            raise Exception("Non-standard residue")
+            raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
         if sugar_conformation == "other":
             if res_name in ("A", "G"):
@@ -378,7 +378,7 @@ class SugarPuckerBasedSugarValidator(Validator):
                 return self.bonds_definition["pucker==DA_DG_other"]
             if res_name in ("DU", "DT", "DC"):
                 return self.bonds_definition["pucker==DU_DT_DC_other"]
-            raise Exception("Non-standard residue")
+            raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
         if res_name in ("A", "G"):
             return self.basic_bonds_definition["sugar_basic==A_G"]
@@ -389,7 +389,7 @@ class SugarPuckerBasedSugarValidator(Validator):
         if res_name in ("DU", "DT", "DC"):
             return self.basic_bonds_definition["sugar_basic==DU_DT_DC"]
 
-        raise Exception("Non-standard residue")
+        raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
     def _find_anlge_definitions(
         self, res_name: str, altloc: str, atom1_name: str, atom2_name: str, atom3_name: str
@@ -409,7 +409,7 @@ class SugarPuckerBasedSugarValidator(Validator):
                 return self.angles_definition["pucker==DA_DG_C2p_endo"]
             if res_name in ("DU", "DT", "DC"):
                 return self.angles_definition["pucker==DU_DT_DC_C2p_endo"]
-            raise Exception("Non-standard residue")
+            raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
         if sugar_conformation == "C3'-endo":
             if res_name in ("A", "G"):
@@ -420,7 +420,7 @@ class SugarPuckerBasedSugarValidator(Validator):
                 return self.angles_definition["pucker==DA_DG_C3p_endo"]
             if res_name in ("DU", "DT", "DC"):
                 return self.angles_definition["pucker==DU_DT_DC_C3p_endo"]
-            raise Exception("Non-standard residue")
+            raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
         if sugar_conformation == "other":
             if res_name in ("A", "G"):
@@ -432,7 +432,7 @@ class SugarPuckerBasedSugarValidator(Validator):
                 return self.angles_definition["pucker==DA_DG_other"]
             if res_name in ("DU", "DT", "DC"):
                 return self.angles_definition["pucker==DU_DT_DC_other"]
-            raise Exception("Non-standard residue")
+            raise NonStandardResidueException(f"Non-standard residue: {res_name}")
 
         if res_name in ("A", "G"):
             return self.basic_angles_definition["sugar_basic==A_G"]
@@ -443,4 +443,4 @@ class SugarPuckerBasedSugarValidator(Validator):
         if res_name in ("DU", "DT", "DC"):
             return self.basic_angles_definition["sugar_basic==DU_DT_DC"]
 
-        raise Exception("Non-standard residue")
+        raise NonStandardResidueException(f"Non-standard residue: {res_name}")
