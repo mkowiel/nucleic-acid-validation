@@ -13,6 +13,8 @@ from naval.validators.geometry_validator import GeometryValidator
 from naval.validators.po4_validator import Po4Validator
 from naval.validators.sugar_pucker_validator import SugarPuckerBasedSugarValidator
 
+MAX_RESIDUE_DISTANCE = 2.0
+
 
 def read_structure(pdb_file_path: str) -> Structure:
     """
@@ -38,6 +40,25 @@ def fill_residue_cache(structure: Structure, pdbcode: str) -> List[ResidueCacheE
     return residue_cache
 
 
+def calc_res_pair_dist(atom_name1, res1, atom_name2, res2):
+    "Return minimal distance for a pair of atoms, taking into account the alternative conformations"
+    try:
+        atom_group1 = res1.residue[atom_name1]
+        atoms1 = atom_group1.disordered_get_list() if atom_group1.is_disordered() else [atom_group1]
+
+        atom_group2 = res2.residue[atom_name2]
+        atoms2 = atom_group2.disordered_get_list() if atom_group2.is_disordered() else [atom_group2]
+    except KeyError:
+        return float("inf")
+
+    dists = []
+    for atom1 in atoms1:
+        for atom2 in atoms2:
+            if atom1.get_altloc() == atom2.get_altloc() or atom1.get_altloc() == " " or atom2.get_altloc() == " ":
+                dists.append(round(atom2 - atom1, 3))
+    return min(dists)
+
+
 def link_residues(residue_cache: List[ResidueCacheEntry]) -> List[ResidueCacheEntry]:
     """
     Link all residures so that it is possible to easily select previous or next residue
@@ -50,8 +71,16 @@ def link_residues(residue_cache: List[ResidueCacheEntry]) -> List[ResidueCacheEn
             abs(current_residue.resseq - prev_residue.resseq) == 1
             or (current_residue.resseq == prev_residue.resseq and (current_residue.inscode != " " or prev_residue.inscode != " "))
         ):
-            current_residue.prev_res = prev_residue
-            prev_residue.next_res = current_residue
+            # O3'(prev) is close enough to P(next) or O3'(next) is close enough to P(prev)
+            if (
+                min(
+                    calc_res_pair_dist("O3'", prev_residue, "P", current_residue),
+                    calc_res_pair_dist("P", prev_residue, "O3'", current_residue),
+                )
+                < MAX_RESIDUE_DISTANCE
+            ):
+                current_residue.prev_res = prev_residue
+                prev_residue.next_res = current_residue
     return residue_cache
 
 
@@ -70,7 +99,7 @@ def calculate_geometry(residue_cache: List[ResidueCacheEntry]) -> List[ResidueCa
 
 def validate_structure(structure) -> Tuple[List[ValidationRecord], List[TorsionRecord]]:
     """
-    Calculates torsion angles and pass residues through valitaors.
+    Calculates torsion angles and pass residues through validators.
     """
     pdbcode = structure.id
     print(f"# PDB id: {pdbcode}")
