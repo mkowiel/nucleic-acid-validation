@@ -83,6 +83,9 @@ def test_iterate_struct_1d8g_cif():
     assert len(filter_records_atoms(records, "angle", "A", "C6", "N1", "C2")) == 11
     assert len(filter_records_atoms(records, "angle", "A", "OP1", "P", "OP2")) == 15
 
+    # 5 + 1 disorder
+    assert len(filter_records_atoms(records, "angle", "A", "N9", "C1'", "O4'")) == 6
+
 
 def test_iterate_struct_5hr7():
     struct = read_structure(os.path.dirname(__file__) + "/examples/5hr7.pdb")
