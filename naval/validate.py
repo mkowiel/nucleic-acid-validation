@@ -56,7 +56,9 @@ def calc_res_pair_dist(atom_name1, res1, atom_name2, res2):
         for atom2 in atoms2:
             if atom1.get_altloc() == atom2.get_altloc() or atom1.get_altloc() == " " or atom2.get_altloc() == " ":
                 dists.append(round(atom2 - atom1, 3))
-    return min(dists)
+    if dists:
+        return min(dists)
+    return float("inf")
 
 
 def link_residues(residue_cache: List[ResidueCacheEntry]) -> List[ResidueCacheEntry]:
