@@ -361,8 +361,12 @@ SUGAR_PUCER_BASED_SUGAR_ANGLES = {
         AngleDefinition(
             "pucker==DA_DG_C2p_endo", "C5'", "C4'", "O4'", 0, 0, 0, 108.9, 1.1, 66057, 109.8, 1.0, 104.7, 115.3, 100.2, 121.2
         ),
-        AngleDefinition("pucker==DA_DG_C2p_endo", "N9 ", "C1'", "O4'", 0, 0, 0, 108.0, 1.0, 0, 180, 180, 0, 360, 0, 360),
-        AngleDefinition("pucker==DA_DG_C2p_endo", "N9 ", "C1'", "C2'", 0, 0, 0, 115.0, 1.0, 0, 180, 180, 0, 360, 0, 360),
+        AngleDefinition(
+            "pucker==DA_DG_C2p_endo", "N9 ", "C1'", "O4'", 0, 0, 0, 108.0, 1.0, 66077, 108.2, 1.4, 101.0, 114.9, 95.4, 122.1
+        ),
+        AngleDefinition(
+            "pucker==DA_DG_C2p_endo", "N9 ", "C1'", "C2'", 0, 0, 0, 115.0, 1.0, 66077, 114.6, 1.6, 108.0, 121.0, 98.1, 128.0
+        ),
         AngleDefinition(
             "pucker==DA_DG_C2p_endo", "C4'", "C5'", "O5'", 0, 0, 0, 111.0, 2.3, 65959, 110.6, 1.2, 104.4, 115.8, 98.5, 121.0
         ),
@@ -401,8 +405,12 @@ SUGAR_PUCER_BASED_SUGAR_ANGLES = {
         AngleDefinition(
             "pucker==DA_DG_C3p_endo", "C5'", "C4'", "O4'", 0, 0, 0, 109.6, 1.0, 7858, 109.6, 1.2, 104.1, 116.1, 101.8, 120.5
         ),
-        AngleDefinition("pucker==DA_DG_C3p_endo", "N9 ", "C1'", "O4'", 0, 0, 0, 107.5, 0.7, 0, 180, 180, 0, 360, 0, 360),
-        AngleDefinition("pucker==DA_DG_C3p_endo", "N9 ", "C1'", "C2'", 0, 0, 0, 113.6, 0.8, 0, 180, 180, 0, 360, 0, 360),
+        AngleDefinition(
+            "pucker==DA_DG_C3p_endo", "N9 ", "C1'", "O4'", 0, 0, 0, 107.5, 0.7, 7858, 108.5, 1.1, 102.8, 113.4, 95.7, 118.7
+        ),
+        AngleDefinition(
+            "pucker==DA_DG_C3p_endo", "N9 ", "C1'", "C2'", 0, 0, 0, 113.6, 0.8, 7858, 113.8, 1.6, 106.6, 120.5, 103.8, 122.2
+        ),
         AngleDefinition(
             "pucker==DA_DG_C3p_endo", "C4'", "C5'", "O5'", 0, 0, 0, 111.9, 1.3, 7849, 110.5, 1.4, 104.1, 116.3, 101.2, 124.3
         ),
@@ -423,8 +431,8 @@ SUGAR_PUCER_BASED_SUGAR_ANGLES = {
         AngleDefinition("pucker==DA_DG_other", "C4'", "C3'", "O3'", 0, 0, 0, 110.2, 1.8, 26998, 109.4, 2.1, 100.1, 120.5, 91.6, 126.5),
         AngleDefinition("pucker==DA_DG_other", "C3'", "C4'", "C5'", 0, 0, 0, 114.9, 1.5, 27000, 114.8, 1.4, 106.8, 122.6, 97.9, 128.1),
         AngleDefinition("pucker==DA_DG_other", "C5'", "C4'", "O4'", 0, 0, 0, 108.7, 1.4, 27000, 109.6, 1.4, 103.1, 117.6, 99.4, 121.1),
-        AngleDefinition("pucker==DA_DG_other", "N9 ", "C1'", "O4'", 0, 0, 0, 107.7, 1.3, 0, 180, 180, 0, 360, 0, 360),
-        AngleDefinition("pucker==DA_DG_other", "N9 ", "C1'", "C2'", 0, 0, 0, 115.4, 0.9, 0, 180, 180, 0, 360, 0, 360),
+        AngleDefinition("pucker==DA_DG_other", "N9 ", "C1'", "O4'", 0, 0, 0, 107.7, 1.3, 27034, 108.5, 1.5, 101.6, 116.6, 95.6, 126.4),
+        AngleDefinition("pucker==DA_DG_other", "N9 ", "C1'", "C2'", 0, 0, 0, 115.4, 0.9, 27034, 114.2, 1.8, 106.1, 121.8, 97.9, 126.0),
         AngleDefinition("pucker==DA_DG_other", "C4'", "C5'", "O5'", 0, 0, 0, 110.9, 2.1, 26939, 110.5, 1.6, 103.4, 117.7, 98.5, 140.9),
         AngleDefinition("pucker==DA_DG_other", "C1'", "N9", "C4", 0, 0, 0, 127.6, 1.9, 27026, 126.6, 1.0, 121.6, 130.6, 114.5, 139.6),
         AngleDefinition("pucker==DA_DG_other", "C1'", "N9", "C8", 0, 0, 0, 126.2, 1.9, 27026, 127.4, 1.0, 123.5, 132.1, 114.2, 141.6),
