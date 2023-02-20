@@ -18,6 +18,12 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+    - name: Tox cache
+      uses: actions/cache@v3
+      with:
+        path: .tox
+        key: tos-${{ matrix.os }}-python-${{ matrix.python }}-${{ hashFiles('**/tox.ini')}}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('requirements.txt') }}
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip

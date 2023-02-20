@@ -107,9 +107,7 @@ class AnglesCsvPrinter(Printer):
                 record.atom2.get_name(),
                 record.atom2.get_altloc().strip(),
                 record.atom3.get_parent().get_resname() if record.atom3 else "",
-                str(record.atom3.get_parent().get_id()[1]) + record.atom3.get_parent().get_id()[2].strip()
-                if record.atom3
-                else "",
+                str(record.atom3.get_parent().get_id()[1]) + record.atom3.get_parent().get_id()[2].strip() if record.atom3 else "",
                 record.atom3.get_name() if record.atom3 else "",
                 record.atom3.get_altloc().strip() if record.atom3 else "",
                 round(record.calculated_value, 1),

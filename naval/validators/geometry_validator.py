@@ -36,11 +36,7 @@ class GeometryValidator:
         records.extend(self._add_torsions("torsion", "theta3", self.geometry.theta3, None))
         records.extend(self._add_torsions("torsion", "theta4", self.geometry.theta4, None))
         records.extend(self._add_torsions("pseudorotation", "tau_max", self.geometry.tau_max, None))
-        records.extend(
-            self._add_torsions(
-                "pseudorotation", "pseudorotation", self.geometry.pseudorotation, self.geometry.sugar_conformation
-            )
-        )
+        records.extend(self._add_torsions("pseudorotation", "pseudorotation", self.geometry.pseudorotation, self.geometry.sugar_conformation))
         return records
 
     def validate(self) -> List[TorsionRecord]:

@@ -33,6 +33,11 @@ To execute tests suit run:
 
 # Changelog
 
+## 0.0.5
+
+- Bonds and angle stats based on structures PDB/[NAKB](https://nakb.org/) (Release date >= 2010-01-01, Resolution <= 3.6A, Method = X-Ray, Without alternative conformation)
+- Neighbors atom search bug fixes
+
 ## 0.0.4
 
 - Sugar validation based on residue name and sugar pucker (C2'-endo, C3'-endo, other)
@@ -42,12 +47,12 @@ To execute tests suit run:
 
 ## 0.0.3
 
-- Validate Base based on residue name, PO4 based on alhpa and zeta torsion angles, and sugar part based only
+- Validate Base based on residue name, PO4 based on alpha and zeta torsion angles, and sugar part based only
 on residue name.
 
 # TODO:
 
-- add sugar conformation depenent values
+- add sugar conformation dependent values
 - add options to select sugar validation level (residue, pseudorotation, conformation dependent)
 - do not copy the target values to validation records, we can reuse target definition (may be problematic for functional dependencies)
 - more tests

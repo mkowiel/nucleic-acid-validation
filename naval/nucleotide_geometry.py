@@ -75,9 +75,7 @@ class NucleotideGeometry:
             return {"": None}
         return {"": self._round_torsion(atom1, atom2, atom3, atom4)}
 
-    def _calculate_disordered_torsions(
-        self, atom_names: List[str], atom_relative_positions: List[int]
-    ) -> Dict[str, Optional[float]]:
+    def _calculate_disordered_torsions(self, atom_names: List[str], atom_relative_positions: List[int]) -> Dict[str, Optional[float]]:
         torsions = {}
 
         try:

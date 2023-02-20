@@ -74,10 +74,7 @@ class ValidationRecord:
         self.pdb_suspicious_right: float = pdb_suspicious_right
 
     def __str__(self) -> str:
-        return (
-            f"{self.validation_type} {self.name} {self.atom1} {self.atom2}"
-            f" {self.atom3} {self.calculated_value:.3f} {self.target_value}"
-        )
+        return f"{self.validation_type} {self.name} {self.atom1} {self.atom2}" f" {self.atom3} {self.calculated_value:.3f} {self.target_value}"
 
     def is_preferred(self) -> bool:
         return self.csd_preferred_left <= self.calculated_value <= self.csd_preferred_right
@@ -87,9 +84,7 @@ class ValidationRecord:
 
     def is_suspicious(self) -> bool:
         return (
-            False
-            if (self.is_preferred() or self.is_allowed())
-            else (self.pdb_suspicious_left <= self.calculated_value <= self.pdb_suspicious_right)
+            False if (self.is_preferred() or self.is_allowed()) else (self.pdb_suspicious_left <= self.calculated_value <= self.pdb_suspicious_right)
         )
 
     def is_outlier(self) -> bool:

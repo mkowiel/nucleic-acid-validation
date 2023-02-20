@@ -36,7 +36,7 @@ def filter_records_atoms(records, record_type, chain, atom1, atom2, atom3):
     ]
 
 
-def filter_records_bond(records, chain, resseq1, atom1, resseq2, atom2):
+def filter_records_bond(records, chain, res_id1, res_inscode1, atom1, res_id2, res_inscode2, atom2):
     # pylint: disable=too-many-arguments
     return [
         record
@@ -46,8 +46,10 @@ def filter_records_bond(records, chain, resseq1, atom1, resseq2, atom2):
             and chain == record.geometry.residue_entry.chain.get_id()
             and (atom1 == record.atom1.name)
             and (atom2 == record.atom2.name)
-            and (resseq1 == record.atom1.get_parent().get_id())
-            and (resseq2 == record.atom2.get_parent().get_id())
+            and (res_id1 == record.atom1.get_parent().get_id()[1])
+            and (res_inscode1 == record.atom1.get_parent().get_id()[2])
+            and (res_id2 == record.atom2.get_parent().get_id()[1])
+            and (res_inscode2 == record.atom2.get_parent().get_id()[2])
         )
     ]
 
@@ -81,6 +83,9 @@ def test_iterate_struct_1d8g_cif():
     assert len(filter_records_atoms(records, "angle", "A", "C6", "N1", "C2")) == 11
     assert len(filter_records_atoms(records, "angle", "A", "OP1", "P", "OP2")) == 15
 
+    # 5 + 1 disorder
+    assert len(filter_records_atoms(records, "angle", "A", "N9", "C1'", "O4'")) == 6
+
 
 def test_iterate_struct_5hr7():
     struct = read_structure(os.path.dirname(__file__) + "/examples/5hr7.pdb")
@@ -90,13 +95,22 @@ def test_iterate_struct_5hr7():
     assert len(filter_records_atoms(records, "angle", "D", "OP1", "P", "OP2")) == 71 - 2 + 1
     assert len(filter_records_atoms(records, "angle", "D", "OP1", "P", "O3'")) == 71 - 2 + 1 - 1
 
-    assert len(filter_records_bond(records, "D", (" ", 19, " "), "OP1", (" ", 19, " "), "P")) == 1
+    assert len(filter_records_bond(records, "D", 19, " ", "OP1", 19, " ", "P")) == 1
 
     # if atoms are taken from the same res then it will be greater than 0
-    assert len(filter_records_bond(records, "D", (" ", 19, " "), "O3'", (" ", 19, " "), "P")) == 0
-    assert len(filter_records_bond(records, "D", (" ", 19, " "), "O3'", (" ", 20, " "), "P")) == 1
+    assert len(filter_records_bond(records, "D", 19, " ", "O3'", 19, " ", "P")) == 0
+    assert len(filter_records_bond(records, "D", 19, " ", "O3'", 20, " ", "P")) == 1
 
     # we between residue 20 and 21 there is 20A inserted, we should have one bond between 20 and 20A and 20A and 21
-    assert len(filter_records_bond(records, "D", (" ", 20, " "), "O3'", (" ", 21, " "), "P")) == 0
-    assert len(filter_records_bond(records, "D", (" ", 20, " "), "O3'", (" ", 20, "A"), "P")) == 1
-    assert len(filter_records_bond(records, "D", (" ", 20, "A"), "O3'", (" ", 21, " "), "P")) == 1
+    assert len(filter_records_bond(records, "D", 20, " ", "O3'", 21, " ", "P")) == 0
+    assert len(filter_records_bond(records, "D", 20, " ", "O3'", 20, "A", "P")) == 1
+    assert len(filter_records_bond(records, "D", 20, "A", "O3'", 21, " ", "P")) == 1
+
+
+def test_iterate_struct_6bel_cif():
+    struct = read_structure(os.path.dirname(__file__) + "/examples/6bel.cif")
+    records, _geometry = validate_structure(struct)
+    assert len(records) > 0
+
+    # seems to be far away, it is 18.1A apart and should be filtered out
+    assert len(filter_records_bond(records, "A", 406, " ", "O3'", 407, " ", "P")) == 0
