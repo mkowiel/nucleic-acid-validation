@@ -1,0 +1,14 @@
+#!/usr/bin/env python
+import argparse
+from naval.validate import main
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Tool for validation of RNA/DNA bonds and angles geometry')
+
+    parser.add_argument('structure_filename', type=str, default='structure.cif', help='structure file in mmCif or Pdb format (.cif|.pdb)')
+    parser.add_argument('bonds_filename', type=str, default='bonds.csv', help='Bonds validation summary file (.csv)')
+    parser.add_argument('angles_filename', type=str, default='angles.csv', help='Angles validation summary file (.csv)')
+    parser.add_argument('geometry_filename', type=str, default='geometry.csv', help='Residue Geometry summary file (.csv)')
+
+    args = parser.parse_args()
+    main(args.structure_filename, args.bonds_filename, args.angles_filename, args.geometry_filename)
