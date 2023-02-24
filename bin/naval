@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+import argparse
+import os
+
+from naval.validate import main
+
+
+if __name__ == "__main__":
+
+    def extension_check(param, extensions):
+         base, ext = os.path.splitext(param)
+         if ext.lower() not in extensions:
+              extension_msg = ' or '.join(extensions)
+              raise argparse.ArgumentTypeError(f'File must have a {extension_msg} extension')
+         return param
+
+    def csv_extension(param):
+         return extension_check(param, ('.csv',))
+
+    def pdb_cif_extension(param):
+         return extension_check(param, ('.cif', '.pdb'))
+
+    parser = argparse.ArgumentParser(description='Tool for validation of RNA/DNA bonds and angles geometry')
+
+    parser.add_argument('in_structure_filename', type=pdb_cif_extension, help='Input structure file in mmCif or Pdb format (.cif|.pdb)')
+    parser.add_argument('out_bonds_filename', type=csv_extension, nargs='?', default='bonds.csv', help='Output bonds validation summary file (.csv), default: `bonds.csv`')
+    parser.add_argument('out_angles_filename', type=csv_extension, nargs='?', default='angles.csv', help='Output angles validation summary file (.csv), default: `angles.csv`')
+    parser.add_argument('out_geometry_filename', type=csv_extension, nargs='?', default='geometry.csv', help='Output residue geometry summary file (.csv), default: `geometry.csv`')
+
+    args = parser.parse_args()
+    main(args.in_structure_filename, args.out_bonds_filename, args.out_angles_filename, args.out_geometry_filename)
