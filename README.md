@@ -42,7 +42,7 @@ For example for 3p4j structure
 
 # Output format
 
-The validation of nucleotides bonds and angles are stored in a `.csv` format.
+The validation results for nucleotide bonds and angles are stored in a `.csv` format.
 
 - **type**: `bond`, `angle`, `torsion` or `pseudorotation`
 - **pdbcode**: pdbcode extracted from the file name
@@ -63,11 +63,16 @@ The validation of nucleotides bonds and angles are stored in a `.csv` format.
 - **calculated:** calculate value for bond length, angle or torsion angle for given atoms
 - **target**: expected bond length, angle or torsion angle for given atoms (based on the CSD)
 - **validation_label**: a 4-tier validation category (`CSD-preferred`, `PDB-acceptable`, `PDB-suspicious` or `PDB-outlier`)
-- **validator_name**: internal validator name, based on detected conformation (for debug purposes)
+- **validator_name**: internal validator name, based on detected conformation (for debugging)
 
 # Description
 
-The library uses Biopython library to parse a structure in a mmCif or pdb format. Then calculates nucleotide geometry (torsion angles and sugar pucker pseudorotation) and validates bonds and angles based on the CSD-derived target values and PDB-derived distributions for conformation dependent group. CSD-based target values are based on the publications:
+The library uses Biopython to parse structures in a mmCif or pdb format.
+After parsing the input file, the library calculates nucleotide geometry
+(torsion angles and sugar pucker pseudorotation) and validates bonds and
+angles based on the CSD-derived target values and PDB-derived distributions
+within conformation-dependent groups. CSD-based target values are
+based on the publications:
 
 M.Kowiel, D.Brzezinski, M.Jaskolski (2016).
 *Conformation-dependent restraints for polynucleotides: I. clustering of the geometry of the phosphodiester group.*
